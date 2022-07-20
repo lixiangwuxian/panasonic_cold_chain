@@ -1,11 +1,9 @@
 QT       += core gui
 
 INCLUDEPATH += C:\Users\lixiangwuxian\vcpkg\packages\sqlite3_x86-windows\include\
-               C:\Users\lixiangwuxian\Desktop\SongXia\new_excel_editer\excel_editor\include\
                "C:\Program Files (x86)\OpenXLSX\include"
 
 LIBS += -lcomdlg32\
-        "C:\Program Files (x86)\OpenXLSX\lib\OpenXLSX.lib"
 
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
