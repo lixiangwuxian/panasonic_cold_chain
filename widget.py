@@ -18,11 +18,9 @@ class cirTableModel(QAbstractTableModel):
         self.dataSource=None
 
     def load_data(self, data):
-        self.input_dates =[] # [1,2,3,4,5,6,7,8,9,10]
-        self.input_magnitudes =[]# [2,3,4,5,6,7,8,9,10,11]
-
-        self.column_count = 16 #共14列，见headerData
-        self.row_count = 20
+        self.dataSource = data
+        self.column_count = 16 #共16列，见headerData
+        self.row_count = 0
 
     def rowCount(self, parent=QModelIndex()):
         return self.row_count
@@ -41,18 +39,19 @@ class cirTableModel(QAbstractTableModel):
     def data(self, index, role=Qt.DisplayRole):
         column = index.column()
         row = index.row()
-        return None#debug
+        #return None#debug
         if role == Qt.DisplayRole:
             cellData=self.dataSource[row][column]
+            return cellData
         elif role == Qt.BackgroundRole:
             return QColor(Qt.white)
         elif role == Qt.TextAlignmentRole:
             return Qt.AlignRight
         return None
 
-    def setDataSource(self,dataSource,row_count):
+    def appendDataSource(self,dataSource):
         self.dataSource=dataSource
-        self.row_count=row_count
+        self.row_count=len(dataSource)
         self.layoutChanged.emit()
 
 #class itemTableModel(QAbstractTableModel):
@@ -71,11 +70,12 @@ class MainWindow(QMainWindow):
         self.circulationRecordTable=self.centralWidget().findChild(QTableView, "circulationListTableView")
         self.circulationRecordTable.setModel(cirTableModel())
         self.circulationRecordTable.verticalHeader().hide()
-        #self.circulationRecordTable.horizontalHeader().setStretchLastSection(True)#无需铺满
         #self.circulationRecordTable.horizontalHeader().resizeSection(0, 50)
         self.circulationRecordTable.horizontalHeader().setDefaultSectionSize(75)
         self.circulationRecordTable.verticalHeader().setDefaultSectionSize(5);
-        #self.headerWidthList=[50,100,]//todo..
+        self.headerWidthList=[50,150,80,150,50,50,50,50,50,50,80,80,80,50,50,80]#todo..
+        for i in range(len(self.headerWidthList)):
+            self.circulationRecordTable.horizontalHeader().resizeSection(i, self.headerWidthList[i])
         self.itemRecordTable=self.centralWidget().findChild(QTableView, "itemRecordTableView")
 
     def openFileNameDialog(self):
@@ -94,8 +94,11 @@ class MainWindow(QMainWindow):
 
     def importPushButtonClicked(self):
         print("importPushButtonClicked")
-        self.excelObj.initFile(self.openFileNameDialog())
-        self.circulationRecordTable.model().setDataSource(self.excelObj.getSheetDataAll(),1)
+        filePath=self.openFileNameDialog()
+        if filePath==None:
+            return
+        self.excelObj.initFile(filePath)
+        self.circulationRecordTable.model().appendDataSource(self.excelObj.getSheetAllData())
     def deletePushButtonClicked(self):
         print("deletePushButtonClicked")
     def printPushButtonClicked(self):
