@@ -71,3 +71,11 @@ Thumbs.db
 *.dll
 *.exe
 
+book.xlsx
+detail.xlsx
+打印模版.xls
+样例.xlsx
+~$样例.xlsx
+~$book.xlsx
+~$detail.xlsx
+test.db
