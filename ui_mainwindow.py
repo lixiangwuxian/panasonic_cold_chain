@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'mainwindow.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.3.1
+## Created by: Qt User Interface Compiler version 6.3.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -120,10 +120,10 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_5 = QVBoxLayout()
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
-        self.tableView_2 = QTableView(self.itemListTab)
-        self.tableView_2.setObjectName(u"tableView_2")
+        self.itemRecordTableView = QTableView(self.itemListTab)
+        self.itemRecordTableView.setObjectName(u"itemRecordTableView")
 
-        self.verticalLayout_5.addWidget(self.tableView_2)
+        self.verticalLayout_5.addWidget(self.itemRecordTableView)
 
 
         self.verticalLayout_4.addLayout(self.verticalLayout_5)
@@ -149,7 +149,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)

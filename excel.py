@@ -29,7 +29,11 @@ class ExcelReader:
         xPos=self.pointerX
         yPos=self.pointerY
         if self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value==None:
-            return False
+            yPos+=1
+            if self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value==None:
+                return False
+            else:
+                self.pointerY=yPos
         rowData=[]#流转单；生产批号；生产台数；部品番号；定额；保管员；安全标识；送货量；生产线；工序；接收班组；供应商；工程名；到货日期；
         yPos+=3
         rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#流转单

@@ -1,12 +1,16 @@
-from qrcode import QRCode
+import qrcode
 
 class QrcodeMaker:
     def __init__(self):
-        self.qrcode = QRCode()
+        self.qrcoder = qrcode()
     def setMessage(self, message):
-        self.qrcode.add_data("https://www.baidu.com")
-        self.qrcode.make()
-        self.img = self.qrcode.make_image()
+        self.qrcoder.add_data(message)
+        self.qrcoder.make()
+        self.img = self.qrcoder.make_image()
     def show(self):
         self.img.show()
 
+if __name__ == "__main__":
+    qrcodeMaker = QrcodeMaker()
+    qrcodeMaker.setMessage("https://www.baidu.com")
+    qrcodeMaker.show()

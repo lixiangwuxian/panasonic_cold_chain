@@ -9,54 +9,10 @@ from PySide6.QtCore import QFile, Signal, Slot,QAbstractTableModel,QModelIndex,Q
 from PySide6.QtUiTools import QUiLoader
 from ui_mainwindow import Ui_MainWindow
 from PySide6.QtGui import QColor
+
 from excel import ExcelReader
-
-class cirTableModel(QAbstractTableModel):
-    def __init__(self, data=None):
-        QAbstractTableModel.__init__(self)
-        self.load_data(data)
-        self.dataSource=None
-
-    def load_data(self, data):
-        self.dataSource = data
-        self.column_count = 16 #共16列，见headerData
-        self.row_count = 0
-
-    def rowCount(self, parent=QModelIndex()):
-        return self.row_count
-
-    def columnCount(self, parent=QModelIndex()):
-        return self.column_count
-
-    def headerData(self, section, orientation, role):
-        if role != Qt.DisplayRole:
-            return None
-        if orientation == Qt.Horizontal:
-            return ("编号", "生产批号","生产台数","部品番号","定额","规格","送货量","材料","保管员","生产线","接收班组","供应商","到货日期","工序","工程名","安全标识")[section]
-        else:
-            return f"{section}"
-
-    def data(self, index, role=Qt.DisplayRole):
-        column = index.column()
-        row = index.row()
-        #return None#debug
-        if role == Qt.DisplayRole:
-            cellData=self.dataSource[row][column]
-            return cellData
-        elif role == Qt.BackgroundRole:
-            return QColor(Qt.white)
-        elif role == Qt.TextAlignmentRole:
-            return Qt.AlignRight
-        return None
-
-    def appendDataSource(self,dataSource):
-        self.dataSource=dataSource
-        self.row_count=len(dataSource)
-        self.layoutChanged.emit()
-
-#class itemTableModel(QAbstractTableModel):
-
-
+from sqliteController import sqliteController
+from tablesWidght import cirTableModel,itemTableModel
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -73,10 +29,17 @@ class MainWindow(QMainWindow):
         #self.circulationRecordTable.horizontalHeader().resizeSection(0, 50)
         self.circulationRecordTable.horizontalHeader().setDefaultSectionSize(75)
         self.circulationRecordTable.verticalHeader().setDefaultSectionSize(5);
-        self.headerWidthList=[50,150,80,150,50,50,50,50,50,50,80,80,80,50,50,80]#todo..
+        self.headerWidthList=[50,150,80,150,50,50,50,50,50,50,80,80,80,50,50,80]
         for i in range(len(self.headerWidthList)):
             self.circulationRecordTable.horizontalHeader().resizeSection(i, self.headerWidthList[i])
         self.itemRecordTable=self.centralWidget().findChild(QTableView, "itemRecordTableView")
+        self.itemRecordTable.setModel(itemTableModel())
+        self.itemRecordTable.verticalHeader().hide()
+        self.itemRecordTable.horizontalHeader().setDefaultSectionSize(75)
+        self.itemRecordTable.verticalHeader().setDefaultSectionSize(5);
+        self.headerWidthList=[200,150,200,100]
+        for i in range(len(self.headerWidthList)):
+            self.itemRecordTable.horizontalHeader().resizeSection(i, self.headerWidthList[i])
 
     def openFileNameDialog(self):
         options = QFileDialog.Options()
@@ -98,7 +61,9 @@ class MainWindow(QMainWindow):
         if filePath==None:
             return
         self.excelObj.initFile(filePath)
-        self.circulationRecordTable.model().appendDataSource(self.excelObj.getSheetAllData())
+        dataSource=self.excelObj.getSheetAllData()
+
+        self.circulationRecordTable.model().load_data(dataSource)
     def deletePushButtonClicked(self):
         print("deletePushButtonClicked")
     def printPushButtonClicked(self):
