@@ -25,7 +25,7 @@ class ExcelReader:
     def initFile(self,path):
         self.workbook=openpyxl.load_workbook(path)
         self.sheet=self.workbook.active
-    def getSheetData(self,data):
+    def getCirSheetData(self,data):
         xPos=self.pointerX
         yPos=self.pointerY
         if self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value==None:
@@ -81,13 +81,32 @@ class ExcelReader:
             self.pointerX=1
             self.pointerY+=5
         return True
-    def getSheetAllData(self):
+    def getCirSheetAllData(self):
         data=[]
-        while self.getSheetData(data):
+        while self.getCirSheetData(data):
             continue
         return data
+    def getItemSheetData(self):
+        rowData=[]
+        self.pointerY+=1
+        self.pointerX=1
+        if self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value==None:
+            return []
+        rowData.append(self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value)#partid
+        self.pointerX+=1
+        rowData.append(self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value)#material
+        self.pointerX+=1
+        rowData.append(self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value)#norm
+        self.pointerX+=1
+        rowData.append(self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value)#num
+        for i in range(len(rowData)):
+            if rowData[i]==None:
+                rowData[i]=''
+            rowData[i]=str(rowData[i])
+            rowData[i] = rowData[i].replace(u'\xa0', u'')
+        return rowData
 
 if __name__ == '__main__':
     excel=ExcelReader()
     excel.initFile('样例.xlsx')
-    print(excel.getSheetAllData())
+    print(excel.getCirSheetAllData())

@@ -61,7 +61,7 @@ class MainWindow(QMainWindow):
         if filePath==None:
             return
         self.excelObj.initFile(filePath)
-        dataSource=self.excelObj.getSheetAllData()
+        dataSource=self.excelObj.getCirSheetAllData()
 
         self.circulationRecordTable.model().load_data(dataSource)
     def deletePushButtonClicked(self):
