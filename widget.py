@@ -12,7 +12,7 @@ from PySide6.QtGui import QColor
 
 from excel import ExcelReader
 from sqliteController import sqliteController
-from tablesWidght import cirTableModel,itemTableModel
+from tablesWidghtModel import cirTableModel,itemTableModel
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -75,7 +75,6 @@ class MainWindow(QMainWindow):
         print("finditemPushButtonClicked")
     def deleteItemRecordPushButton(self):
         print("deleteItemRecordPushButtonClicked")
-
 
 if __name__ == "__main__":
     app = QApplication([])
