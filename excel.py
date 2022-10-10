@@ -36,12 +36,12 @@ class ExcelReader:
                 self.pointerY=yPos
         rowData=[]#流转单；生产批号；生产台数；部品番号；定额；保管员；安全标识；送货量；生产线；工序；接收班组；供应商；工程名；到货日期；
         yPos+=3
-        rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#流转单
+        rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#流转单0
         yPos-=3
         xPos+=2
         rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#生产批号
         xPos+=4
-        rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#生产台数
+        rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#生产台数2
         xPos-=4
         yPos+=1
         rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#部品番号
@@ -49,7 +49,7 @@ class ExcelReader:
         rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#定额
         xPos-=4
         yPos+=1
-        rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#保管员
+        rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#保管员5
         xPos+=2
         rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#安全标识
         xPos+=2
@@ -58,16 +58,16 @@ class ExcelReader:
         yPos+=1
         rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#生产线
         xPos+=2
-        rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#工序
+        rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#工序9
         xPos+=2
         rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#接收班组
         xPos-=4
         yPos+=1
         rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#供应商
         xPos+=2
-        rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#工程名
+        rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#工程名12
         xPos+=2
-        rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#到货日期
+        rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#到货日期13
         for i in range(len(rowData)):
             if rowData[i]==None:
                 rowData[i]=''

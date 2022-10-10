@@ -21,6 +21,7 @@ class MainWindow(QMainWindow):
         self.addEventListener()
         self.addTableForm()
         self.excelObj=ExcelReader()
+        self.sqliteObj=sqliteController()
     def addTableForm(self):
         print("Adding table form")
         self.circulationRecordTable=self.centralWidget().findChild(QTableView, "circulationListTableView")
@@ -29,7 +30,7 @@ class MainWindow(QMainWindow):
         #self.circulationRecordTable.horizontalHeader().resizeSection(0, 50)
         self.circulationRecordTable.horizontalHeader().setDefaultSectionSize(75)
         self.circulationRecordTable.verticalHeader().setDefaultSectionSize(5);
-        self.headerWidthList=[50,150,80,150,50,50,50,50,50,50,80,80,80,50,50,80]
+        self.headerWidthList=[100,150,80,150,50,180,50,50,50,50,80,80,80,100,50,80]
         for i in range(len(self.headerWidthList)):
             self.circulationRecordTable.horizontalHeader().resizeSection(i, self.headerWidthList[i])
         self.itemRecordTable=self.centralWidget().findChild(QTableView, "itemRecordTableView")
@@ -62,7 +63,9 @@ class MainWindow(QMainWindow):
             return
         self.excelObj.initFile(filePath)
         dataSource=self.excelObj.getCirSheetAllData()
-
+        for i in range(len(dataSource)):
+            dataSource[i]=self.sqliteObj.handleCirTabDataLine(dataSource[i])
+            print(dataSource[i])
         self.circulationRecordTable.model().load_data(dataSource)
     def deletePushButtonClicked(self):
         print("deletePushButtonClicked")
