@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 import win32api
 
-from PySide6.QtWidgets import QApplication, QWidget,QMainWindow,QPushButton,QTableView,QFileDialog
+from PySide6.QtWidgets import QApplication, QWidget,QMainWindow,QPushButton,QTableView,QFileDialog,QLineEdit
 from PySide6.QtCore import QFile, Signal, Slot,QAbstractTableModel,QModelIndex,Qt
 from PySide6.QtUiTools import QUiLoader
 from ui_mainwindow import Ui_MainWindow
@@ -17,11 +17,12 @@ from tablesWidghtModel import cirTableModel,itemTableModel
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
+        self.sqliteObj=sqliteController()
         Ui_MainWindow().setupUi(self)
-        self.addEventListener()
         self.addTableForm()
         self.excelObj=ExcelReader()
-        self.sqliteObj=sqliteController()
+        self.addEventListener()
+
     def addTableForm(self):
         print("Adding table form")
         self.circulationRecordTable=self.centralWidget().findChild(QTableView, "circulationListTableView")
@@ -41,6 +42,7 @@ class MainWindow(QMainWindow):
         self.headerWidthList=[200,150,200,100]
         for i in range(len(self.headerWidthList)):
             self.itemRecordTable.horizontalHeader().resizeSection(i, self.headerWidthList[i])
+        self.itemRecordTable.model().load_data(self.sqliteObj.getItemData())
 
     def openFileNameDialog(self):
         options = QFileDialog.Options()
@@ -53,8 +55,9 @@ class MainWindow(QMainWindow):
         self.centralWidget().findChild(QPushButton, "importPushButton").clicked.connect(self.importPushButtonClicked)
         self.centralWidget().findChild(QPushButton, "deletePushButton").clicked.connect(self.deletePushButtonClicked)
         self.centralWidget().findChild(QPushButton, "printPushButton").clicked.connect(self.printPushButtonClicked)
-        self.centralWidget().findChild(QPushButton, "findItemPushButton").clicked.connect(self.finditemPushButtonClicked)
+        #self.centralWidget().findChild(QPushButton, "findItemPushButton").clicked.connect(self.finditemPushButtonClicked)
         self.centralWidget().findChild(QPushButton, "deleteItemRecordPushButton").clicked.connect(self.deleteItemRecordPushButton)
+        self.centralWidget().findChild(QLineEdit, "itemIdTextEdit").textChanged.connect(self.itemIdTextEditChanged)
 
     def importPushButtonClicked(self):
         print("importPushButtonClicked")
@@ -69,12 +72,18 @@ class MainWindow(QMainWindow):
         self.circulationRecordTable.model().load_data(dataSource)
     def deletePushButtonClicked(self):
         print("deletePushButtonClicked")
+        rangeSelected=self.circulationRecordTable.model().seletedranges()
     def printPushButtonClicked(self):
         print("printPushButtonClicked")
-    def finditemPushButtonClicked(self):
-        print("finditemPushButtonClicked")
+    # def finditemPushButtonClicked(self):
+    #     print("finditemPushButtonClicked")
     def deleteItemRecordPushButton(self):
         print("deleteItemRecordPushButtonClicked")
+    def itemIdTextEditChanged(self):
+        print("itemIdTextEditChanged")
+        itemId=self.centralWidget().findChild(QLineEdit, "itemIdTextEdit").text()
+        print(itemId)
+        self.itemRecordTable.model().load_data(self.sqliteObj.searchInformByPartID(itemId))
 
 if __name__ == "__main__":
     app = QApplication([])

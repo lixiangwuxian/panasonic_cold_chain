@@ -15,8 +15,12 @@ class sqliteController:
         self.CirConunter=0
         return
     def getInformByPartID(self,PartName):#返回部件其余信息
-        cursor=self.connItem.execute('SELECT * FROM detail WHERE partid=?',(PartName,))
+        cursor=self.connItem.execute('SELECT * FROM detail WHERE partid LIKE ?',("%"+PartName+"%",))
         partData=cursor.fetchone()
+        return partData
+    def searchInformByPartID(self,PartName):#返回查找到的所有部件信息
+        cursor=self.connItem.execute('SELECT partid,material,norm,num,id FROM detail WHERE partid LIKE ?',("%"+PartName+"%",))
+        partData=cursor.fetchall()
         return partData
     def handleCirTabDataLine(self,rowData):
         partData=self.getInformByPartID(rowData[3])
@@ -43,6 +47,13 @@ class sqliteController:
         data.append(rowData[6])#安全标识
         data.append(rowData[0])#流转单号
         return data
+    def getItemData(self):#返回detail表中所有数据
+        cursor=self.connItem.execute('SELECT partid,material,norm,num,id FROM detail')
+        return cursor.fetchall()
+    def deleteItemRecord(self,ids):
+        for id in ids:
+            self.connItem.execute('DELETE FROM detail WHERE id=?',(id,))
+        return
     ###用于初始化数据库
     def initData(self,excelCtl):
         self.connItem.execute('CREATE TABLE IF NOT EXISTS detail (id INTEGER PRIMARY KEY AUTOINCREMENT, partid TEXT,material TEXT,norm TEXT,num TEXT)')
@@ -56,13 +67,13 @@ class sqliteController:
 
 if __name__=='__main__':#将excel中的数据导入到sqlite中
     sqlCtl=sqliteController()
-    # excelCtl=excel.ExcelReader()
-    # excelCtl.initFile('detail.xlsx')
-    # sqlCtl.initData(excelCtl)
-    # while True:
-    #     rowData=excelCtl.getItemSheetData()
-    #     if rowData==[]:
-    #         break
-    #     sqlCtl.insertItemData(rowData)
-    # sqlCtl.commitSqlite()
-    print(sqlCtl.getInformByPartID('7FC-2-7160-047-00'))
+    excelCtl=excel.ExcelReader()
+    excelCtl.initFile('detail.xlsx')
+    sqlCtl.initData(excelCtl)
+    while True:
+        rowData=excelCtl.getItemSheetData()
+        if rowData==[]:
+            break
+        sqlCtl.insertItemData(rowData)
+    sqlCtl.commitSqlite()
+    print(sqlCtl.getItemData())

@@ -56,7 +56,7 @@ class itemTableModel(MyTableModel):
         self.dataSource=None
 
     def load_data(self, data):
-        self.dataSource = None
+        self.dataSource = data
         self.column_count = 4 #共4列，见headerData
         if(data==None):
             self.row_count = 0
