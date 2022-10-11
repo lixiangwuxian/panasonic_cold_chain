@@ -47,13 +47,12 @@ class sqliteController:
         data.append(rowData[6])#安全标识
         data.append(rowData[0])#流转单号
         return data
-    def getItemData(self):#返回detail表中所有数据
-        cursor=self.connItem.execute('SELECT partid,material,norm,num,id FROM detail')
-        return cursor.fetchall()
-    def deleteItemRecord(self,ids):
-        for id in ids:
-            self.connItem.execute('DELETE FROM detail WHERE id=?',(id,))
-        return
+    # def getItemData(self):#返回detail表中所有数据
+    #     cursor=self.connItem.execute('SELECT partid,material,norm,num,id FROM detail')
+    #     return cursor.fetchall()
+    def deleteItemRecord(self,id):
+        self.connItem.execute('DELETE FROM detail WHERE id=?',(id,))
+        print(id)
     ###用于初始化数据库
     def initData(self,excelCtl):
         self.connItem.execute('CREATE TABLE IF NOT EXISTS detail (id INTEGER PRIMARY KEY AUTOINCREMENT, partid TEXT,material TEXT,norm TEXT,num TEXT)')
@@ -76,4 +75,3 @@ if __name__=='__main__':#将excel中的数据导入到sqlite中
             break
         sqlCtl.insertItemData(rowData)
     sqlCtl.commitSqlite()
-    print(sqlCtl.getItemData())

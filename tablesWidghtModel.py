@@ -47,6 +47,10 @@ class cirTableModel(MyTableModel):
         else:
             self.row_count = len(data)
         self.layoutChanged.emit()
+    def removeRow(self, row):
+        self.dataSource.pop(row)
+        self.row_count -= 1
+
 
 
 class itemTableModel(MyTableModel):
@@ -71,3 +75,8 @@ class itemTableModel(MyTableModel):
             return ("部品番号","材料","规格","数量")[section]
         else:
             return f"{section}"
+
+    def removeRow(self, row):
+        self.dataSource.pop(row)
+        self.row_count -= 1
+        self.layoutChanged.emit()
