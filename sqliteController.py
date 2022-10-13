@@ -29,23 +29,24 @@ class sqliteController:
         self.CirConunter+=1
         today=datetime.date.today().strftime('%Y%m%d')
         data=[]
-        data.append(today+getStrForNum(self.CirConunter))#编号
-        data.append(rowData[1])#生产批号
-        data.append(rowData[2])#生产台数
-        data.append(rowData[3])#部品番号
-        data.append(rowData[4])#定额
-        data.append(partData[3])#规格
-        data.append(rowData[7])#送货量
-        data.append(partData[2])#材料
-        data.append(rowData[5])#保管员
-        data.append(rowData[8])#生产线
-        data.append(rowData[10])#接收班组
-        data.append(rowData[11])#供应商
-        data.append(rowData[13])#到货日期
-        data.append(rowData[9])#工序
-        data.append(rowData[12])#工程名
-        data.append(rowData[6])#安全标识
-        data.append(rowData[0])#流转单号
+        data.append(today+getStrForNum(self.CirConunter))#编号0
+        data.append(rowData[1])#生产批号1
+        data.append(rowData[2])#生产台数2
+        data.append(rowData[3])#部品番号3
+        data.append(rowData[4])#定额4
+        data.append(partData[3])#规格5
+        data.append(rowData[7])#送货量6
+        data.append(partData[2])#材料7
+        data.append(rowData[5])#保管员8
+        data.append(rowData[8])#生产线9
+        data.append(rowData[10])#接收班组10
+        data.append(rowData[11])#供应商11
+        data.append(rowData[13])#到货日期12
+        data.append(rowData[9])#工序13
+        data.append(rowData[12])#工程名14
+        data.append(rowData[6])#安全标识15
+        data.append(rowData[0])#流转单号16
+        data.append(rowData[11])#供应商17
         return data
     # def getItemData(self):#返回detail表中所有数据
     #     cursor=self.connItem.execute('SELECT partid,material,norm,num,id FROM detail')

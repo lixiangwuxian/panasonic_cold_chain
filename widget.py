@@ -4,15 +4,16 @@ from pathlib import Path
 import sys
 import win32api
 
-from PySide6.QtWidgets import QApplication,QAbstractItemView, QWidget,QMainWindow,QPushButton,QTableView,QFileDialog,QLineEdit
+from PySide6.QtWidgets import QApplication,QAbstractItemView, QWidget,QMainWindow,QPushButton,QTableView,QFileDialog,QLineEdit,QMessageBox
 from PySide6.QtCore import QFile, Signal, Slot,QAbstractTableModel,QModelIndex,Qt
 from PySide6.QtUiTools import QUiLoader
 from ui_mainwindow import Ui_MainWindow
 from PySide6.QtGui import QColor
 
-from excel import ExcelReader
+from excel import ExcelReader,ExcelWriter
 from sqliteController import sqliteController
 from tablesWidghtModel import cirTableModel,itemTableModel
+from qrcodeController import QrcodeController
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -21,6 +22,8 @@ class MainWindow(QMainWindow):
         Ui_MainWindow().setupUi(self)
         self.addTableForm()
         self.excelObj=ExcelReader()
+        self.printObj=ExcelWriter()
+        self.qrcodeObj=QrcodeController()
         self.addEventListener()
 
     def addTableForm(self):
@@ -29,7 +32,6 @@ class MainWindow(QMainWindow):
         self.circulationRecordTable.setModel(cirTableModel())
         self.circulationRecordTable.setSelectionBehavior(QAbstractItemView.SelectRows);
         self.circulationRecordTable.verticalHeader().hide()
-        #self.circulationRecordTable.horizontalHeader().resizeSection(0, 50)
         self.circulationRecordTable.horizontalHeader().setDefaultSectionSize(75)
         self.circulationRecordTable.verticalHeader().setDefaultSectionSize(5);
         self.headerWidthList=[100,150,80,150,50,180,50,50,50,50,80,80,80,100,50,80]
@@ -69,26 +71,44 @@ class MainWindow(QMainWindow):
         dataSource=self.excelObj.getCirSheetAllData()
         for i in range(len(dataSource)):
             dataSource[i]=self.sqliteObj.handleCirTabDataLine(dataSource[i])
-            print(dataSource[i])
+            dataSource[i].append(self.qrcodeObj.getQrCodeFromData(dataSource[i]))
+            #print(dataSource[i])
+        #dataSource[0][18].show()
         self.circulationRecordTable.model().load_data(dataSource)
 
     def deletePushButtonClicked(self):
         print("deletePushButtonClicked")
         self.cirSelectModel=self.circulationRecordTable.selectionModel()
         if(not self.cirSelectModel.hasSelection()):
-            print("No selection")
+            #print("No selection")
+            return
+        confirmDialog=QMessageBox()
+        confirmDialog.setWindowTitle("提示")
+        confirmDialog.setText("确认删除？")
+        confirmDialog.setStandardButtons(QMessageBox.Yes|QMessageBox.No)
+        confirmDialog.setDefaultButton(QMessageBox.No)
+        if(confirmDialog.exec()==QMessageBox.No):
             return
         for i in self.cirSelectModel.selectedRows():
             self.circulationRecordTable.model().removeRow(self.cirSelectModel.selectedRows()[0].row())
 
     def printPushButtonClicked(self):
         print("printPushButtonClicked")
+        self.printObj.initFile("打印模版.xlsx")
+        self.printObj.writeData(self.circulationRecordTable.model().dataSource)
 
     def deleteItemRecordPushButton(self):
         print("deleteItemRecordPushButtonClicked")
         self.itemSelectModel=self.itemRecordTable.selectionModel()
         if(not self.itemSelectModel.hasSelection()):
-            print("No selection")
+            #print("No selection")
+            return
+        confirmDialog=QMessageBox()
+        confirmDialog.setWindowTitle("提示")
+        confirmDialog.setText("确认删除？")
+        confirmDialog.setStandardButtons(QMessageBox.Yes|QMessageBox.No)
+        confirmDialog.setDefaultButton(QMessageBox.No)
+        if(confirmDialog.exec()==QMessageBox.No):
             return
         for i in self.itemSelectModel.selectedRows():
             self.sqliteObj.deleteItemRecord(self.itemRecordTable.model().dataSource[self.itemSelectModel.selectedRows()[0].row()][4])

@@ -1,7 +1,11 @@
 import openpyxl
+from shutil import copyfile
 
 from PySide6.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog
 from PySide6.QtGui import QIcon
+import openpyxl.drawing.image
+import win32api
+import win32print
 
 def xPosGetter(pointx):
     pointx-=1
@@ -108,6 +112,81 @@ class ExcelReader:
             rowData[i]=str(rowData[i])
             rowData[i] = rowData[i].replace(u'\xa0', u'')
         return rowData
+
+class ExcelWriter:
+    def __init__(self):
+        self.pageCounter=0
+    def initFile(self,path):
+        self.sourceFile=path
+        self.pageCounter+=1
+        self.target="./tmp/"+self.pageCounter.__str__()+self.sourceFile
+        copyfile(self.sourceFile,self.target)
+        self.workbook=openpyxl.load_workbook(self.target)
+        self.sheet=self.workbook.active
+        self.pointerX=1
+        self.pointerY=1
+    def writeRowData(self,rowData):
+        self.pointerX+=2
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[1]#生产批号
+        self.pointerX+=2
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[2]#生产台数
+        self.pointerX-=2
+        self.pointerY+=1
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[3]#部品番号
+        self.pointerX+=2
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[4]#定额
+        self.pointerX-=2
+        self.pointerY+=1
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[5]#规格
+        self.pointerX+=2
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[6]#送货量
+        self.pointerX-=2
+        self.pointerY+=1
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[7]#材料
+        self.pointerX+=2
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[8]#保管员
+        self.pointerX-=2
+        self.pointerY+=1
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[9]#生产线
+        self.pointerX+=2
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[10]#接收班组
+        self.pointerX-=2
+        self.pointerY+=1
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[11]#供应商
+        self.pointerX+=2
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[12]#到货日期
+        self.pointerX-=4
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[16]#流转单号
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].alignment=openpyxl.styles.Alignment(horizontal='center',vertical='center')
+        self.pointerX+=5
+        self.pointerY-=5
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].alignment=openpyxl.styles.Alignment(horizontal='center',vertical='center')
+        QRImage=openpyxl.drawing.image.Image(rowData[18])
+        QRImage.anchor=xPosGetter(self.pointerX)+yPosGetter(self.pointerY)
+        QRImage.width=QRImage.height=145
+        self.sheet.add_image(QRImage)
+        self.pointerX-=5
+        if self.pointerX==1:
+            self.pointerX=8
+        elif self.pointerX==8:
+            if self.pointerY!=22:
+                self.pointerX=1
+                self.pointerY+=7
+            else:
+                self.saveFile(path=self.target)
+                self.printFileToPaper()#done one page
+                self.initFile(self.sourceFile)
+    def writeData(self,data):
+        for i in range(len(data)):
+            self.writeRowData(data[i])
+    def saveFile(self,path):
+        self.workbook.save(path)
+    def printFileToPaper(self):
+        print('printing to paper')
+        fileName=self.target
+        fileName=fileName.replace('/','\\')
+        #printerName='Microsoft Print to PDF'
+        win32api.ShellExecute(0,"printto",fileName,'"%s"' % win32print.GetDefaultPrinter (),".",0)
 
 if __name__ == '__main__':
     excel=ExcelReader()
