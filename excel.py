@@ -2,10 +2,11 @@ import openpyxl
 from shutil import copyfile
 
 from PySide6.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog
+
 from PySide6.QtGui import QIcon
 import openpyxl.drawing.image
-import win32api
-import win32print
+import os
+import sendToPrinter
 
 def xPosGetter(pointx):
     pointx-=1
@@ -18,7 +19,6 @@ def xPosGetter(pointx):
             xstring+=alphabet[pointx%26]
             pointx=pointx//26-1
     return xstring[::-1]
-
 def yPosGetter(pointy):
     return str(pointy)
 
@@ -118,8 +118,9 @@ class ExcelWriter:
         self.pageCounter=0
     def initFile(self,path):
         self.sourceFile=path
-        self.pageCounter+=1
-        self.target="./tmp/"+self.pageCounter.__str__()+self.sourceFile
+        #self.pageCounter+=1
+        #self.target="./tmp/"+self.pageCounter.__str__()+self.sourceFile
+        self.target="./tmp/"+self.sourceFile
         copyfile(self.sourceFile,self.target)
         self.workbook=openpyxl.load_workbook(self.target)
         self.sheet=self.workbook.active
@@ -173,20 +174,33 @@ class ExcelWriter:
                 self.pointerX=1
                 self.pointerY+=7
             else:
-                self.saveFile(path=self.target)
-                self.printFileToPaper()#done one page
-                self.initFile(self.sourceFile)
+                return False
+                # self.saveFile(path=self.target)
+                # self.printFileToPaper()#done one page
+                # self.initFile(self.sourceFile)
+        return True
     def writeData(self,data):
         for i in range(len(data)):
-            self.writeRowData(data[i])
+            rs=self.writeRowData(data[i])
+            if rs==False:
+                self.saveFile(path=self.target)
+                self.printFileToPaper()
+                self.initFile(self.sourceFile)
+        if len(data)%8!=0:
+            self.saveFile(path=self.target)
+            self.printFileToPaper()
+            self.initFile(self.sourceFile)
+        print("Print done")
     def saveFile(self,path):
         self.workbook.save(path)
     def printFileToPaper(self):
         print('printing to paper')
         fileName=self.target
+        fileName=fileName.replace('./tmp/','/tmp/')
         fileName=fileName.replace('/','\\')
-        #printerName='Microsoft Print to PDF'
-        win32api.ShellExecute(0,"printto",fileName,'"%s"' % win32print.GetDefaultPrinter (),".",0)
+        currentPath=os.getcwd()
+        fileName=currentPath+fileName
+        sendToPrinter.sendToPrinter(fileName)
 
 if __name__ == '__main__':
     excel=ExcelReader()

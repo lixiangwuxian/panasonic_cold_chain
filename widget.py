@@ -1,5 +1,6 @@
 # This Python file uses the following encoding: utf-8
 import os
+import glob
 from pathlib import Path
 import sys
 import win32api
@@ -14,6 +15,11 @@ from excel import ExcelReader,ExcelWriter
 from sqliteController import sqliteController
 from tablesWidghtModel import cirTableModel,itemTableModel
 from qrcodeController import QrcodeController
+
+
+def files(curr_dir = './tmp/', ext = '*'):       #  当前目录下的文件
+  for i in glob.glob(os.path.join(curr_dir, ext)):
+    yield i
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -127,4 +133,9 @@ if __name__ == "__main__":
     mainWindow = MainWindow()
     mainWindow.setWindowTitle("松下冷链");
     mainWindow.show()
-    sys.exit(app.exec())
+    if app.exec() == 0:
+        print("exit")
+        for i in files("./tmp","*"):
+            os.remove(i)
+        print("All tmp files deleted")
+    sys.exit(0)
