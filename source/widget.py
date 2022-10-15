@@ -17,19 +17,21 @@ from tablesWidghtModel import cirTableModel,itemTableModel
 from qrcodeController import QrcodeController
 
 
-def files(curr_dir = './tmp/', ext = '*'):       #  当前目录下的文件
+def files(curr_dir = './tmp/', ext = '*'):
   for i in glob.glob(os.path.join(curr_dir, ext)):
     yield i
 
 class MainWindow(QMainWindow):
     def __init__(self):
+        if not os.path.exists("./tmp"):
+            os.mkdir("./tmp")
         super(MainWindow, self).__init__()
         self.sqliteObj=sqliteController()
         Ui_MainWindow().setupUi(self)
+        self.qrcodeObj=QrcodeController()
         self.addTableForm()
         self.excelObj=ExcelReader()
         self.printObj=ExcelWriter()
-        self.qrcodeObj=QrcodeController()
         self.addEventListener()
 
     def addTableForm(self):
@@ -43,6 +45,13 @@ class MainWindow(QMainWindow):
         self.headerWidthList=[100,200,80,150,50,200,50,50,50,50,80,80,80,100,50,80]
         for i in range(len(self.headerWidthList)):
             self.circulationRecordTable.horizontalHeader().resizeSection(i, self.headerWidthList[i])
+        self.dataSource=self.sqliteObj.getLastTimeCirData()
+        #print(self.dataSource)
+        if self.dataSource!=None:
+            for i in range(len(self.dataSource)):
+                self.dataSource[i]=list(self.dataSource[i])
+                self.dataSource[i].append(self.qrcodeObj.getQrCodeFromData(self.dataSource[i]))
+        self.circulationRecordTable.model().load_data(self.dataSource)
         self.itemRecordTable=self.centralWidget().findChild(QTableView, "itemRecordTableView")
         self.itemRecordTable.setModel(itemTableModel())
         self.itemRecordTable.verticalHeader().hide()
@@ -75,12 +84,15 @@ class MainWindow(QMainWindow):
             return
         self.excelObj.initFile(filePath)
         dataSource=self.excelObj.getCirSheetAllData()
+        self.sqliteObj.resetCirCounter()
         for i in range(len(dataSource)):
             dataSource[i]=self.sqliteObj.handleCirTabDataLine(dataSource[i])
             dataSource[i].append(self.qrcodeObj.getQrCodeFromData(dataSource[i]))
             #print(dataSource[i])
         #dataSource[0][18].show()
         self.circulationRecordTable.model().load_data(dataSource)
+        self.sqliteObj.dropCirTable()
+        self.sqliteObj.saveCurrentCirData(dataSource)
 
     def deletePushButtonClicked(self):
         print("deletePushButtonClicked")
@@ -96,8 +108,10 @@ class MainWindow(QMainWindow):
         if(confirmDialog.exec()==QMessageBox.No):
             return
         for i in self.cirSelectModel.selectedRows():
+            self.sqliteObj.deleteCirData(self.dataSource[self.cirSelectModel.selectedRows()[0].row()])
             self.circulationRecordTable.model().removeRow(self.cirSelectModel.selectedRows()[0].row())
-            self.circulationRecordTable.model().layoutChanged.emit()
+        self.sqliteObj.commitSqlite()
+        self.circulationRecordTable.model().layoutChanged.emit()
 
     def printPushButtonClicked(self):
         print("printPushButtonClicked")
@@ -129,8 +143,8 @@ class MainWindow(QMainWindow):
         for i in self.itemSelectModel.selectedRows():
             self.sqliteObj.deleteItemRecord(self.itemRecordTable.model().dataSource[self.itemSelectModel.selectedRows()[0].row()][4])
             self.itemRecordTable.model().removeRow(self.itemSelectModel.selectedRows()[0].row())
-            self.itemRecordTable.model().layoutChanged.emit()
-            self.sqliteObj.commitSqlite()
+        self.itemRecordTable.model().layoutChanged.emit()
+        self.sqliteObj.commitSqlite()
 
     def itemIdTextEditChanged(self):
         print("itemIdTextEditChanged")

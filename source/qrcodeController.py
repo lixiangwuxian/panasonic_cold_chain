@@ -18,7 +18,7 @@ def classReplacer(text):
 
 def messageHandler(message):
     qrData=''
-    qrData+=message[17]#供应商
+    qrData+=message[11]#供应商
     qrData+=','
     qrData+=message[1]#生产批号
     qrData+=','
@@ -32,7 +32,12 @@ def messageHandler(message):
 
 class QrcodeController:
     def __init__(self):
-        self.qrcoder =qrcode.QRCode()
+        self.qrcoder =qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4
+        )
     def getQrCodeFromData(self, message):
         self.qrcoder.clear()
         imgName=messageHandler(message)

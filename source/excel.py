@@ -80,7 +80,7 @@ class ExcelReader:
                 rowData[i]=''
             rowData[i]=str(rowData[i])
             rowData[i] = rowData[i].replace(u'\xa0', u'')
-        print(rowData)
+        #print(rowData)
         data.append(rowData)
         if self.pointerX==1:
             self.pointerX=9
@@ -164,11 +164,11 @@ class ExcelWriter:
         self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[12]#到货日期
         self.pointerX-=6
         self.pointerY-=5
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value='流转单'+rowData[16]#流转单号
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value='流转单'+rowData[16]#流转单号16
         #self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].alignment=openpyxl.styles.Alignment(horizontal='center',vertical='center')
         self.pointerX+=7
         self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].alignment=openpyxl.styles.Alignment(horizontal='center',vertical='center')
-        QRImage=openpyxl.drawing.image.Image(rowData[18])
+        QRImage=openpyxl.drawing.image.Image(rowData[17])
         QRImage.anchor=xPosGetter(self.pointerX)+yPosGetter(self.pointerY)
         QRImage.width=QRImage.height=145
         self.sheet.add_image(QRImage)

@@ -22,6 +22,35 @@ class sqliteController:
         cursor=self.conn.execute('SELECT partid,material,norm,num,id FROM detail WHERE partid LIKE ?',("%"+PartName+"%",))
         partData=cursor.fetchall()
         return partData
+    def saveCurrentCirDataRow(self,rowData):
+        #print(rowData)
+        self.conn.execute('INSERT INTO book (编号,生产批号,生产台数,部品番号,定额,规格,送货量,材料,保管员,生产线,接收班组,供应商,到货日期,工序,工程名,安全标识,流转单号) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',rowData[:17])
+        return
+    def saveCurrentCirData(self,excelData):
+        self.conn.execute('CREATE TABLE IF NOT EXISTS book (编号 TEXT PRIMARY KEY, 生产批号 TEXT,生产台数 TEXT,部品番号 TEXT,定额 TEXT,规格 TEXT,送货量 TEXT,材料 TEXT,保管员 TEXT,生产线 TEXT,接收班组 TEXT,供应商 TEXT,到货日期 TEXT,工序 TEXT,工程名 TEXT,安全标识 TEXT,流转单号 TEXT)')
+        #print(excelData)
+        for i in range(len(excelData)):
+            self.saveCurrentCirDataRow(excelData[i])
+        self.conn.commit()
+        return
+    def getLastTimeCirData(self):
+        print('getLastTimeCirData')
+        try:
+            cursor=self.conn.execute('SELECT * FROM book')
+            CirData=cursor.fetchall()
+            #print(CirData)
+            return CirData
+        except Exception as e:
+            print(e)
+            return None
+    def deleteCirData(self,id):
+        self.conn.execute('DELETE FROM book WHERE 编号=?',(id[0],))
+    def dropCirTable(self):
+        try:
+            self.conn.execute('DROP TABLE book')
+        except Exception as e:
+            print(e)
+        self.conn.commit()
     def handleCirTabDataLine(self,rowData):
         partData=self.getInformByPartID(rowData[3])
         if partData==None:
@@ -46,12 +75,13 @@ class sqliteController:
         data.append(rowData[12])#工程名14
         data.append(rowData[6])#安全标识15
         data.append(rowData[0])#流转单号16
-        data.append(rowData[11])#供应商17
         return data
-
     def deleteItemRecord(self,id):
         self.conn.execute('DELETE FROM detail WHERE id=?',(id,))
         print(id)
+    def resetCirCounter(self):
+        self.CirConunter=0
+        return
     ###以下用于初始化数据库
     def initData(self,excelCtl):
         self.conn.execute('CREATE TABLE IF NOT EXISTS detail (id INTEGER PRIMARY KEY AUTOINCREMENT, partid TEXT,material TEXT,norm TEXT,num TEXT)')
@@ -73,4 +103,5 @@ if __name__=='__main__':#将excel中的数据导入到sqlite中
         if rowData==[]:
             break
         sqlCtl.insertItemData(rowData)
+    sqlCtl.insertItemData(['','PE','不要做',''])
     sqlCtl.commitSqlite()
