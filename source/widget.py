@@ -103,7 +103,7 @@ class MainWindow(QMainWindow):
         print("printPushButtonClicked")
         if self.circulationRecordTable.model().dataSource is None or len(self.circulationRecordTable.model().dataSource)==0:
             return
-        self.printObj.initFile("打印模版.xlsx")
+        self.printObj.initFile("./data/打印模版.xlsx")
         waitDialog=QMessageBox()
         waitDialog.setWindowTitle("提示")
         waitDialog.setText("正在打印，请稍后")

@@ -120,7 +120,7 @@ class ExcelWriter:
         self.sourceFile=path
         #self.pageCounter+=1
         #self.target="./tmp/"+self.pageCounter.__str__()+self.sourceFile
-        self.target="./tmp/"+self.sourceFile
+        self.target=self.sourceFile.replace("./data/","./tmp/")
         copyfile(self.sourceFile,self.target)
         self.workbook=openpyxl.load_workbook(self.target)
         self.sheet=self.workbook.active

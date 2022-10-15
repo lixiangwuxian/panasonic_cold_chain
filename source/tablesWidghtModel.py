@@ -24,7 +24,7 @@ class MyTableModel(QAbstractTableModel):
         elif role == Qt.BackgroundRole:
             return QColor(Qt.white)
         elif role == Qt.TextAlignmentRole:
-            return Qt.AlignRight
+            return Qt.AlignLeft
         return None
 
 class cirTableModel(MyTableModel):

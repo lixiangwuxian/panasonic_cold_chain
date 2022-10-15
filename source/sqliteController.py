@@ -10,8 +10,8 @@ def getStrForNum(num):
     return returnStr
 class sqliteController:
     def __init__(self):
-        self.conn=sqlite3.connect('simple.db')
-        #self.conn=sqlite3.connect('detail.db')
+        self.conn=sqlite3.connect('./data/simple.db')
+        #self.conn=sqlite3.connect('./data/detail.db')
         self.CirConunter=0
         return
     def getInformByPartID(self,PartName):#返回部件其余信息
@@ -48,13 +48,11 @@ class sqliteController:
         data.append(rowData[0])#流转单号16
         data.append(rowData[11])#供应商17
         return data
-    # def getItemData(self):#返回detail表中所有数据
-    #     cursor=self.conn.execute('SELECT partid,material,norm,num,id FROM detail')
-    #     return cursor.fetchall()
+
     def deleteItemRecord(self,id):
         self.conn.execute('DELETE FROM detail WHERE id=?',(id,))
         print(id)
-    ###用于初始化数据库
+    ###以下用于初始化数据库
     def initData(self,excelCtl):
         self.conn.execute('CREATE TABLE IF NOT EXISTS detail (id INTEGER PRIMARY KEY AUTOINCREMENT, partid TEXT,material TEXT,norm TEXT,num TEXT)')
         return
@@ -68,7 +66,7 @@ class sqliteController:
 if __name__=='__main__':#将excel中的数据导入到sqlite中
     sqlCtl=sqliteController()
     excelCtl=excel.ExcelReader()
-    excelCtl.initFile('detail.xlsx')
+    excelCtl.initFile('./data/detail.xlsx')
     sqlCtl.initData(excelCtl)
     while True:
         rowData=excelCtl.getItemSheetData()
