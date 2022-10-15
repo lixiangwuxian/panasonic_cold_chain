@@ -1,14 +1,20 @@
 import qrcode
 
 def classReplacer(text):
-    if text=='四厂发泡':
-        return '21'
-    if text=='二厂发泡':
+    if(text=='一厂发泡'):
+        return '1'
+    elif text=='二厂发泡':
         return '2'
-    if text=='三厂发泡':
+    elif text=='三厂发泡':
         return '16'
-    if text=='组装':
+    elif text=='四厂发泡':
+        return '21'
+    elif text=='组装':
         return '8'
+    elif text=='生产准备':
+        return '19'
+    else:
+        raise Exception('班组 '+text+' 对应的序号未知')
 
 def messageHandler(message):
     qrData=''

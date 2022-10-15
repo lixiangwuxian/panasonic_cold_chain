@@ -10,16 +10,16 @@ def getStrForNum(num):
     return returnStr
 class sqliteController:
     def __init__(self):
-        self.connCir=sqlite3.connect('book.db')
-        self.connItem=sqlite3.connect('detail.db')
+        self.conn=sqlite3.connect('simple.db')
+        #self.conn=sqlite3.connect('detail.db')
         self.CirConunter=0
         return
     def getInformByPartID(self,PartName):#返回部件其余信息
-        cursor=self.connItem.execute('SELECT * FROM detail WHERE partid LIKE ?',("%"+PartName+"%",))
+        cursor=self.conn.execute('SELECT * FROM detail WHERE partid LIKE ?',("%"+PartName+"%",))
         partData=cursor.fetchone()
         return partData
     def searchInformByPartID(self,PartName):#返回查找到的所有部件信息
-        cursor=self.connItem.execute('SELECT partid,material,norm,num,id FROM detail WHERE partid LIKE ?',("%"+PartName+"%",))
+        cursor=self.conn.execute('SELECT partid,material,norm,num,id FROM detail WHERE partid LIKE ?',("%"+PartName+"%",))
         partData=cursor.fetchall()
         return partData
     def handleCirTabDataLine(self,rowData):
@@ -49,20 +49,20 @@ class sqliteController:
         data.append(rowData[11])#供应商17
         return data
     # def getItemData(self):#返回detail表中所有数据
-    #     cursor=self.connItem.execute('SELECT partid,material,norm,num,id FROM detail')
+    #     cursor=self.conn.execute('SELECT partid,material,norm,num,id FROM detail')
     #     return cursor.fetchall()
     def deleteItemRecord(self,id):
-        self.connItem.execute('DELETE FROM detail WHERE id=?',(id,))
+        self.conn.execute('DELETE FROM detail WHERE id=?',(id,))
         print(id)
     ###用于初始化数据库
     def initData(self,excelCtl):
-        self.connItem.execute('CREATE TABLE IF NOT EXISTS detail (id INTEGER PRIMARY KEY AUTOINCREMENT, partid TEXT,material TEXT,norm TEXT,num TEXT)')
+        self.conn.execute('CREATE TABLE IF NOT EXISTS detail (id INTEGER PRIMARY KEY AUTOINCREMENT, partid TEXT,material TEXT,norm TEXT,num TEXT)')
         return
     def insertItemData(self,rowData):
-        self.connItem.execute('INSERT INTO detail (partid,material,norm,num) VALUES (?,?,?,?)',(rowData[0],rowData[1],rowData[2],rowData[3]))
+        self.conn.execute('INSERT INTO detail (partid,material,norm,num) VALUES (?,?,?,?)',(rowData[0],rowData[1],rowData[2],rowData[3]))
         return
     def commitSqlite(self):
-        self.connItem.commit()
+        self.conn.commit()
         return
 
 if __name__=='__main__':#将excel中的数据导入到sqlite中

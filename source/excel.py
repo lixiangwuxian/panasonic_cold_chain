@@ -129,47 +129,53 @@ class ExcelWriter:
     def writeRowData(self,rowData):
         self.pointerX+=2
         self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[1]#生产批号
-        self.pointerX+=2
+        self.pointerX+=4
         self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[2]#生产台数
-        self.pointerX-=2
+        self.pointerX-=4
         self.pointerY+=1
         self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[3]#部品番号
-        self.pointerX+=2
+        self.pointerX+=4
         self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[4]#定额
-        self.pointerX-=2
+        self.pointerX-=4
         self.pointerY+=1
         self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[5]#规格
-        self.pointerX+=2
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[6]#送货量
-        self.pointerX-=2
+        self.pointerX+=4
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[7]#材料7
+        self.pointerX-=4
         self.pointerY+=1
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[7]#材料
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[8]#保管员8
         self.pointerX+=2
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[8]#保管员
-        self.pointerX-=2
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[15]#安全标识15
+        self.pointerX+=2
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[6]#送货量6
+        self.pointerX-=4
         self.pointerY+=1
         self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[9]#生产线
         self.pointerX+=2
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[13]#工序13
+        self.pointerX+=2
         self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[10]#接收班组
-        self.pointerX-=2
+        self.pointerX-=4
         self.pointerY+=1
         self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[11]#供应商
         self.pointerX+=2
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[14]#工程名14
+        self.pointerX+=2
         self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[12]#到货日期
-        self.pointerX-=4
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[16]#流转单号
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].alignment=openpyxl.styles.Alignment(horizontal='center',vertical='center')
-        self.pointerX+=5
+        self.pointerX-=6
         self.pointerY-=5
+        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value='流转单'+rowData[16]#流转单号
+        #self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].alignment=openpyxl.styles.Alignment(horizontal='center',vertical='center')
+        self.pointerX+=7
         self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].alignment=openpyxl.styles.Alignment(horizontal='center',vertical='center')
         QRImage=openpyxl.drawing.image.Image(rowData[18])
         QRImage.anchor=xPosGetter(self.pointerX)+yPosGetter(self.pointerY)
         QRImage.width=QRImage.height=145
         self.sheet.add_image(QRImage)
-        self.pointerX-=5
+        self.pointerX-=7
         if self.pointerX==1:
-            self.pointerX=8
-        elif self.pointerX==8:
+            self.pointerX=10
+        elif self.pointerX==10:
             if self.pointerY!=22:
                 self.pointerX=1
                 self.pointerY+=7

@@ -40,7 +40,7 @@ class MainWindow(QMainWindow):
         self.circulationRecordTable.verticalHeader().hide()
         self.circulationRecordTable.horizontalHeader().setDefaultSectionSize(75)
         self.circulationRecordTable.verticalHeader().setDefaultSectionSize(5);
-        self.headerWidthList=[100,150,80,150,50,180,50,50,50,50,80,80,80,100,50,80]
+        self.headerWidthList=[100,200,80,150,50,200,50,50,50,50,80,80,80,100,50,80]
         for i in range(len(self.headerWidthList)):
             self.circulationRecordTable.horizontalHeader().resizeSection(i, self.headerWidthList[i])
         self.itemRecordTable=self.centralWidget().findChild(QTableView, "itemRecordTableView")
@@ -49,7 +49,7 @@ class MainWindow(QMainWindow):
         self.itemRecordTable.setSelectionBehavior(QAbstractItemView.SelectRows);
         self.itemRecordTable.horizontalHeader().setDefaultSectionSize(75)
         self.itemRecordTable.verticalHeader().setDefaultSectionSize(5);
-        self.headerWidthList=[200,150,200,100]
+        self.headerWidthList=[200,100,300,100]
         for i in range(len(self.headerWidthList)):
             self.itemRecordTable.horizontalHeader().resizeSection(i, self.headerWidthList[i])
         self.itemRecordTable.model().load_data(self.sqliteObj.searchInformByPartID(''))
@@ -97,11 +97,21 @@ class MainWindow(QMainWindow):
             return
         for i in self.cirSelectModel.selectedRows():
             self.circulationRecordTable.model().removeRow(self.cirSelectModel.selectedRows()[0].row())
+            self.circulationRecordTable.model().layoutChanged.emit()
 
     def printPushButtonClicked(self):
         print("printPushButtonClicked")
+        if self.circulationRecordTable.model().dataSource is None or len(self.circulationRecordTable.model().dataSource)==0:
+            return
         self.printObj.initFile("打印模版.xlsx")
+        waitDialog=QMessageBox()
+        waitDialog.setWindowTitle("提示")
+        waitDialog.setText("正在打印，请稍后")
+        waitDialog.setTextFormat(Qt.RichText)
+        waitDialog.setStandardButtons(QMessageBox.NoButton)
+        waitDialog.show()
         self.printObj.writeData(self.circulationRecordTable.model().dataSource)
+        waitDialog.close()
 
     def deleteItemRecordPushButton(self):
         print("deleteItemRecordPushButtonClicked")
