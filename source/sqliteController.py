@@ -24,10 +24,10 @@ class sqliteController:
         return partData
     def saveCurrentCirDataRow(self,rowData):
         #print(rowData)
-        self.conn.execute('INSERT INTO book (编号,生产批号,生产台数,部品番号,定额,规格,送货量,材料,保管员,生产线,接收班组,供应商,到货日期,工序,工程名,安全标识,流转单号) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',rowData[:17])
+        self.conn.execute('INSERT INTO book (编号,生产批号,生产台数,部品番号,定额,规格,送货量,材料,保管员,生产线,接收班组,供应商,到货日期,工序,工程名,安全标识,流转单号,二维码) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',rowData)
         return
     def saveCurrentCirData(self,excelData):
-        self.conn.execute('CREATE TABLE IF NOT EXISTS book (编号 TEXT PRIMARY KEY, 生产批号 TEXT,生产台数 TEXT,部品番号 TEXT,定额 TEXT,规格 TEXT,送货量 TEXT,材料 TEXT,保管员 TEXT,生产线 TEXT,接收班组 TEXT,供应商 TEXT,到货日期 TEXT,工序 TEXT,工程名 TEXT,安全标识 TEXT,流转单号 TEXT)')
+        self.conn.execute('CREATE TABLE IF NOT EXISTS book (编号 TEXT PRIMARY KEY, 生产批号 TEXT,生产台数 TEXT,部品番号 TEXT,定额 TEXT,规格 TEXT,送货量 TEXT,材料 TEXT,保管员 TEXT,生产线 TEXT,接收班组 TEXT,供应商 TEXT,到货日期 TEXT,工序 TEXT,工程名 TEXT,安全标识 TEXT,流转单号 TEXT,二维码 TEXT)')
         #print(excelData)
         for i in range(len(excelData)):
             self.saveCurrentCirDataRow(excelData[i])
@@ -75,6 +75,7 @@ class sqliteController:
         data.append(rowData[12])#工程名14
         data.append(rowData[6])#安全标识15
         data.append(rowData[0])#流转单号16
+        data.append(rowData[14])#二维码17
         return data
     def deleteItemRecord(self,id):
         self.conn.execute('DELETE FROM detail WHERE id=?',(id,))

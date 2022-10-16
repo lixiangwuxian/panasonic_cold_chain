@@ -1,4 +1,5 @@
 import openpyxl
+from openpyxl_image_loader import SheetImageLoader
 from shutil import copyfile
 
 from PySide6.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog
@@ -7,6 +8,7 @@ from PySide6.QtGui import QIcon
 import openpyxl.drawing.image
 import os
 import sendToPrinter
+from PIL import Image
 
 def xPosGetter(pointx):
     pointx-=1
@@ -75,7 +77,10 @@ class ExcelReader:
         rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#工程名12
         xPos+=2
         rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#到货日期13
-        for i in range(len(rowData)):
+        xPos+=1
+        yPos-=4
+        rowData.append(self.image_loader.get(xPosGetter(xPos)+yPosGetter(yPos)))#二维码14
+        for i in range(0,13):
             if rowData[i]==None:
                 rowData[i]=''
             rowData[i]=str(rowData[i])
@@ -90,6 +95,7 @@ class ExcelReader:
         return True
     def getCirSheetAllData(self):
         data=[]
+        self.image_loader=SheetImageLoader(self.sheet)
         while self.getCirSheetData(data):
             continue
         return data
@@ -127,52 +133,53 @@ class ExcelWriter:
         self.pointerX=1
         self.pointerY=1
     def writeRowData(self,rowData):
-        self.pointerX+=2
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[1]#生产批号
-        self.pointerX+=4
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[2]#生产台数
-        self.pointerX-=4
-        self.pointerY+=1
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[3]#部品番号
-        self.pointerX+=4
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[4]#定额
-        self.pointerX-=4
-        self.pointerY+=1
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[5]#规格
-        self.pointerX+=4
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[7]#材料7
-        self.pointerX-=4
-        self.pointerY+=1
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[8]#保管员8
-        self.pointerX+=2
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[15]#安全标识15
-        self.pointerX+=2
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[6]#送货量6
-        self.pointerX-=4
-        self.pointerY+=1
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[9]#生产线
-        self.pointerX+=2
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[13]#工序13
-        self.pointerX+=2
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[10]#接收班组
-        self.pointerX-=4
-        self.pointerY+=1
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[11]#供应商
-        self.pointerX+=2
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[14]#工程名14
-        self.pointerX+=2
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value=rowData[12]#到货日期
-        self.pointerX-=6
-        self.pointerY-=5
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value='流转单'+rowData[16]#流转单号16
-        #self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].alignment=openpyxl.styles.Alignment(horizontal='center',vertical='center')
-        self.pointerX+=7
-        self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].alignment=openpyxl.styles.Alignment(horizontal='center',vertical='center')
+        xPos=self.pointerX
+        yPos=self.pointerY
+        xPos+=2
+        self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value=rowData[1]#生产批号
+        xPos+=4
+        self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value=rowData[2]#生产台数
+        xPos-=4
+        yPos+=1
+        self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value=rowData[3]#部品番号
+        xPos+=4
+        self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value=rowData[4]#定额
+        xPos-=4
+        yPos+=1
+        self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value=rowData[5]#规格
+        xPos+=4
+        self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value=rowData[7]#材料7
+        xPos-=4
+        yPos+=1
+        self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value=rowData[8]#保管员8
+        xPos+=2
+        self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value=rowData[15]#安全标识15
+        xPos+=2
+        self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value=rowData[6]#送货量6
+        xPos-=4
+        yPos+=1
+        self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value=rowData[9]#生产线
+        xPos+=2
+        self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value=rowData[13]#工序13
+        xPos+=2
+        self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value=rowData[10]#接收班组
+        xPos-=4
+        yPos+=1
+        self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value=rowData[11]#供应商
+        xPos+=2
+        self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value=rowData[14]#工程名14
+        xPos+=2
+        self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value=rowData[12]#到货日期
+        xPos-=6
+        yPos-=5
+        self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value='流转单'+rowData[16]#流转单号16
+        #self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].alignment=openpyxl.styles.Alignment(horizontal='center',vertical='center')
+        xPos+=7
+        self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].alignment=openpyxl.styles.Alignment(horizontal='center',vertical='center')
         QRImage=openpyxl.drawing.image.Image(rowData[17])
-        QRImage.anchor=xPosGetter(self.pointerX)+yPosGetter(self.pointerY)
+        QRImage.anchor=xPosGetter(xPos)+yPosGetter(yPos)
         QRImage.width=QRImage.height=145
         self.sheet.add_image(QRImage)
-        self.pointerX-=7
         if self.pointerX==1:
             self.pointerX=10
         elif self.pointerX==10:

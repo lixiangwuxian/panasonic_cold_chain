@@ -10,6 +10,7 @@ from PySide6.QtCore import QFile, Signal, Slot,QAbstractTableModel,QModelIndex,Q
 from PySide6.QtUiTools import QUiLoader
 from ui_mainwindow import Ui_MainWindow
 from PySide6.QtGui import QColor
+from PIL import Image
 
 from excel import ExcelReader,ExcelWriter
 from sqliteController import sqliteController
@@ -50,7 +51,7 @@ class MainWindow(QMainWindow):
         if self.dataSource!=None:
             for i in range(len(self.dataSource)):
                 self.dataSource[i]=list(self.dataSource[i])
-                self.dataSource[i].append(self.qrcodeObj.getQrCodeFromData(self.dataSource[i]))
+                #self.dataSource[i].append(self.qrcodeObj.getQrCodeFromData(self.dataSource[i]))
         self.circulationRecordTable.model().load_data(self.dataSource)
         self.itemRecordTable=self.centralWidget().findChild(QTableView, "itemRecordTableView")
         self.itemRecordTable.setModel(itemTableModel())
@@ -83,16 +84,22 @@ class MainWindow(QMainWindow):
         if filePath=="":
             return
         self.excelObj.initFile(filePath)
-        dataSource=self.excelObj.getCirSheetAllData()
+        self.dataSource=self.excelObj.getCirSheetAllData()
         self.sqliteObj.resetCirCounter()
-        for i in range(len(dataSource)):
-            dataSource[i]=self.sqliteObj.handleCirTabDataLine(dataSource[i])
-            dataSource[i].append(self.qrcodeObj.getQrCodeFromData(dataSource[i]))
+        if self.dataSource==None or self.dataSource==[]:
+            QMessageBox.information(self,"提示","请检查表格文件是否正确")
+            return
+        #self.dataSource[0][14].show()
+        for i in files("./tmp","*"):
+            os.remove(i)
+        print("All tmp files deleted")
+        for i in range(len(self.dataSource)):
+            self.dataSource[i]=self.sqliteObj.handleCirTabDataLine(self.dataSource[i])
+            self.dataSource[i].append(self.qrcodeObj.getQrCodeFromData(self.dataSource[i]))
             #print(dataSource[i])
-        #dataSource[0][18].show()
-        self.circulationRecordTable.model().load_data(dataSource)
+        self.circulationRecordTable.model().load_data(self.dataSource)
         self.sqliteObj.dropCirTable()
-        self.sqliteObj.saveCurrentCirData(dataSource)
+        self.sqliteObj.saveCurrentCirData(self.dataSource)
 
     def deletePushButtonClicked(self):
         print("deletePushButtonClicked")
@@ -121,7 +128,6 @@ class MainWindow(QMainWindow):
         waitDialog=QMessageBox()
         waitDialog.setWindowTitle("提示")
         waitDialog.setText("正在打印，请稍后")
-        waitDialog.setTextFormat(Qt.RichText)
         waitDialog.setStandardButtons(QMessageBox.NoButton)
         waitDialog.show()
         self.printObj.writeData(self.circulationRecordTable.model().dataSource)
@@ -157,9 +163,4 @@ if __name__ == "__main__":
     mainWindow = MainWindow()
     mainWindow.setWindowTitle("松下冷链");
     mainWindow.show()
-    if app.exec() == 0:
-        print("exit")
-        for i in files("./tmp","*"):
-            os.remove(i)
-        print("All tmp files deleted")
-    sys.exit(0)
+    sys.exit(app.exec())

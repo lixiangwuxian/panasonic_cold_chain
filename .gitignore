@@ -82,6 +82,10 @@ test.db
 book.db
 detail.db
 /tmp
+/build
+/data
+/dist
 打印模*
 data/simple.db
 simple.db
+widget.spec
