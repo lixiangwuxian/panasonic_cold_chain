@@ -10,7 +10,7 @@ import os
 import sendToPrinter
 from PIL import Image
 
-def xPosGetter(pointx):
+def xPosGetter(pointx):#将数字转换为字母
     pointx-=1
     alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     xstring=''
@@ -21,18 +21,18 @@ def xPosGetter(pointx):
             xstring+=alphabet[pointx%26]
             pointx=pointx//26-1
     return xstring[::-1]
-def yPosGetter(pointy):
+def yPosGetter(pointy):#占位
     return str(pointy)
 
 class ExcelReader:
-    def __init__(self):
+    def __init__(self):#初始化
         return
-    def initFile(self,path):
+    def initFile(self,path):#初始化文件和位置指针
         self.pointerX=1
         self.pointerY=1
         self.workbook=openpyxl.load_workbook(path)
         self.sheet=self.workbook.active
-    def getCirSheetData(self,data):
+    def getCirSheetData(self,data):#获取一行流转单数据
         xPos=self.pointerX
         yPos=self.pointerY
         if self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value==None:
@@ -93,13 +93,13 @@ class ExcelReader:
             self.pointerX=1
             self.pointerY+=5
         return True
-    def getCirSheetAllData(self):
+    def getCirSheetAllData(self):#获取所有数据
         data=[]
         self.image_loader=SheetImageLoader(self.sheet)
         while self.getCirSheetData(data):
             continue
         return data
-    def getItemSheetData(self):
+    def getItemSheetData(self):#获取一行物料单数据
         rowData=[]
         self.pointerY+=1
         self.pointerX=1
@@ -120,9 +120,9 @@ class ExcelReader:
         return rowData
 
 class ExcelWriter:
-    def __init__(self):
+    def __init__(self):#初始化
         self.pageCounter=0
-    def initFile(self,path):
+    def initFile(self,path):#初始化文件
         self.sourceFile=path
         #self.pageCounter+=1
         #self.target="./tmp/"+self.pageCounter.__str__()+self.sourceFile
@@ -132,7 +132,7 @@ class ExcelWriter:
         self.sheet=self.workbook.active
         self.pointerX=1
         self.pointerY=1
-    def writeRowData(self,rowData):
+    def writeRowData(self,rowData):#写入一行数据
         xPos=self.pointerX
         yPos=self.pointerY
         xPos+=2
@@ -171,10 +171,11 @@ class ExcelWriter:
         xPos+=2
         self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value=rowData[12]#到货日期
         xPos-=6
-        yPos-=5
-        self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value='流转单'+rowData[16]#流转单号16
+        yPos-=1
+        self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value=rowData[16]#流转单号16
         #self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].alignment=openpyxl.styles.Alignment(horizontal='center',vertical='center')
         xPos+=7
+        yPos-=4
         self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].alignment=openpyxl.styles.Alignment(horizontal='center',vertical='center')
         QRImage=openpyxl.drawing.image.Image(rowData[17])
         QRImage.anchor=xPosGetter(xPos)+yPosGetter(yPos)
@@ -183,7 +184,7 @@ class ExcelWriter:
         if self.pointerX==1:
             self.pointerX=10
         elif self.pointerX==10:
-            if self.pointerY!=22:
+            if self.pointerY!=29:
                 self.pointerX=1
                 self.pointerY+=7
             else:
@@ -192,21 +193,21 @@ class ExcelWriter:
                 # self.printFileToPaper()#done one page
                 # self.initFile(self.sourceFile)
         return True
-    def writeData(self,data):
+    def writeData(self,data):#写入数据
         for i in range(len(data)):
             rs=self.writeRowData(data[i])
             if rs==False:
                 self.saveFile(path=self.target)
                 self.printFileToPaper()
                 self.initFile(self.sourceFile)
-        if len(data)%8!=0:
+        if len(data)%10!=0:
             self.saveFile(path=self.target)
             self.printFileToPaper()
             self.initFile(self.sourceFile)
         print("Print done")
-    def saveFile(self,path):
+    def saveFile(self,path):#保存文件
         self.workbook.save(path)
-    def printFileToPaper(self):
+    def printFileToPaper(self):#打印文件
         print('printing to paper')
         fileName=self.target
         fileName=fileName.replace('./tmp/','/tmp/')

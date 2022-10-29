@@ -74,6 +74,7 @@ class MainWindow(QMainWindow):
         self.centralWidget().findChild(QPushButton, "importPushButton").clicked.connect(self.importPushButtonClicked)
         self.centralWidget().findChild(QPushButton, "deletePushButton").clicked.connect(self.deletePushButtonClicked)
         self.centralWidget().findChild(QPushButton, "printPushButton").clicked.connect(self.printPushButtonClicked)
+        self.centralWidget().findChild(QPushButton, "insertItemRecordPushButton").clicked.connect(self.insertItemRecordPushButtonClicked)
         #self.centralWidget().findChild(QPushButton, "findItemPushButton").clicked.connect(self.finditemPushButtonClicked)
         self.centralWidget().findChild(QPushButton, "deleteItemRecordPushButton").clicked.connect(self.deleteItemRecordPushButton)
         self.centralWidget().findChild(QLineEdit, "itemIdTextEdit").textChanged.connect(self.itemIdTextEditChanged)
@@ -130,8 +131,17 @@ class MainWindow(QMainWindow):
         waitDialog.setText("正在打印，请稍后")
         waitDialog.setStandardButtons(QMessageBox.NoButton)
         waitDialog.show()
-        self.printObj.writeData(self.circulationRecordTable.model().dataSource)
-        waitDialog.close()
+        try:
+            self.printObj.writeData(self.circulationRecordTable.model().dataSource)
+        except Exception as e:
+            print(e)
+            QMessageBox.information(self,"提示","打印出错，错误信息："+str(e))
+        finally:
+            waitDialog.close()
+
+    def insertItemRecordPushButtonClicked(self):
+        print("insertItemRecordPushButtonClicked")
+        self.excelObj
 
     def deleteItemRecordPushButton(self):
         print("deleteItemRecordPushButtonClicked")

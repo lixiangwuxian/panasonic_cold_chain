@@ -110,6 +110,11 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer_3)
 
+        self.insertItemRecordPushButton = QPushButton(self.itemListTab)
+        self.insertItemRecordPushButton.setObjectName(u"insertItemRecordPushButton")
+
+        self.horizontalLayout_2.addWidget(self.insertItemRecordPushButton)
+
         self.deleteItemRecordPushButton = QPushButton(self.itemListTab)
         self.deleteItemRecordPushButton.setObjectName(u"deleteItemRecordPushButton")
 
@@ -162,6 +167,7 @@ class Ui_MainWindow(object):
         self.printPushButton.setText(QCoreApplication.translate("MainWindow", u"\u6253\u5370", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.circulationListTab), QCoreApplication.translate("MainWindow", u"\u6d41\u8f6c\u5355", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"\u90e8\u54c1\u756a\u53f7\uff1a", None))
+        self.insertItemRecordPushButton.setText(QCoreApplication.translate("MainWindow", u"添加物料单", None))
         # self.findItemPushButton.setText(QCoreApplication.translate("MainWindow", u"\u67e5\u627e", None))
         self.deleteItemRecordPushButton.setText(QCoreApplication.translate("MainWindow", u"\u5220\u9664", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.itemListTab), QCoreApplication.translate("MainWindow", u"\u7269\u6599\u5355", None))
