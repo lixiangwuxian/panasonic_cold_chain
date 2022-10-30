@@ -104,8 +104,8 @@ class ExcelReader:
         rowData=[]
         self.pointerY+=1
         self.pointerX=1
-        if self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value==None:
-            return []
+        #if self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value==None:
+        #    return []
         rowData.append(self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value)#partid
         self.pointerX+=1
         rowData.append(self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value)#material
@@ -113,6 +113,8 @@ class ExcelReader:
         rowData.append(self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value)#norm
         self.pointerX+=1
         rowData.append(self.sheet[xPosGetter(self.pointerX)+yPosGetter(self.pointerY)].value)#num
+        if rowData==[None,None,None,None]:
+            return []
         for i in range(len(rowData)):
             if rowData[i]==None:
                 rowData[i]=''
