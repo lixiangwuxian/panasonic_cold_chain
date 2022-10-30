@@ -85,13 +85,15 @@ class sqliteController:
         return
 
     ###以下用于初始化数据库
-    def initData(self,excelCtl):#初始化物料单表
+    def initData(self):#初始化物料单表
         try:
             self.conn.execute('DROP TABLE detail')
         except Exception as e:
             print(e)
         self.conn.execute('CREATE TABLE IF NOT EXISTS detail (id INTEGER PRIMARY KEY AUTOINCREMENT, partid TEXT,material TEXT,norm TEXT,num TEXT)')
         return
+    def initDataWithOutDrop(self):
+        self.conn.execute("")
     def insertItemData(self,rowData):#插入一行物料单数据
         self.conn.execute('INSERT INTO detail (partid,material,norm,num) VALUES (?,?,?,?)',(rowData[0],rowData[1],rowData[2],rowData[3]))
         return
@@ -103,11 +105,10 @@ if __name__=='__main__':#将excel中的数据导入到sqlite中
     sqlCtl=sqliteController()
     excelCtl=excel.ExcelReader()
     excelCtl.initFile('./data/detail.xlsx')
-    sqlCtl.initData(excelCtl)
+    sqlCtl.initData()
     while True:
         rowData=excelCtl.getItemSheetData()
         if rowData==[]:
             break
         sqlCtl.insertItemData(rowData)
-    sqlCtl.insertItemData(['','PE','不要做',''])
     sqlCtl.commitSqlite()

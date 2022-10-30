@@ -4,7 +4,6 @@ import glob
 from pathlib import Path
 import sys
 import win32api
-
 from PySide6.QtWidgets import QApplication,QAbstractItemView, QWidget,QMainWindow,QPushButton,QTableView,QFileDialog,QLineEdit,QMessageBox
 from PySide6.QtCore import QFile, Signal, Slot,QAbstractTableModel,QModelIndex,Qt
 from PySide6.QtUiTools import QUiLoader
@@ -32,10 +31,9 @@ class MainWindow(QMainWindow):
         self.qrcodeObj=QrcodeController()
         self.addTableForm()
         self.excelObj=ExcelReader()
-        self.printObj=ExcelWriter()
+        self.excelWriterObj=ExcelWriter()
         self.addEventListener()
-
-    def addTableForm(self):
+    def addTableForm(self):#添加表格模版
         print("Adding table form")
         self.circulationRecordTable=self.centralWidget().findChild(QTableView, "circulationListTableView")
         self.circulationRecordTable.setModel(cirTableModel())
@@ -63,13 +61,11 @@ class MainWindow(QMainWindow):
         for i in range(len(self.headerWidthList)):
             self.itemRecordTable.horizontalHeader().resizeSection(i, self.headerWidthList[i])
         self.itemRecordTable.model().load_data(self.sqliteObj.searchInformByPartID(''))
-
     def openFileNameDialog(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self,"打开表格文件", "","表格文件 (*.xlsx);;All Files (*)", options=options)
         return fileName
-
     def addEventListener(self):
         self.centralWidget().findChild(QPushButton, "importPushButton").clicked.connect(self.importPushButtonClicked)
         self.centralWidget().findChild(QPushButton, "deletePushButton").clicked.connect(self.deletePushButtonClicked)
@@ -78,6 +74,8 @@ class MainWindow(QMainWindow):
         #self.centralWidget().findChild(QPushButton, "findItemPushButton").clicked.connect(self.finditemPushButtonClicked)
         self.centralWidget().findChild(QPushButton, "deleteItemRecordPushButton").clicked.connect(self.deleteItemRecordPushButton)
         self.centralWidget().findChild(QLineEdit, "itemIdTextEdit").textChanged.connect(self.itemIdTextEditChanged)
+
+#以下为监听事件
 
     def importPushButtonClicked(self):
         print("importPushButtonClicked")
@@ -101,7 +99,6 @@ class MainWindow(QMainWindow):
         self.circulationRecordTable.model().load_data(self.dataSource)
         self.sqliteObj.dropCirTable()
         self.sqliteObj.saveCurrentCirData(self.dataSource)
-
     def deletePushButtonClicked(self):
         print("deletePushButtonClicked")
         self.cirSelectModel=self.circulationRecordTable.selectionModel()
@@ -120,29 +117,35 @@ class MainWindow(QMainWindow):
             self.circulationRecordTable.model().removeRow(self.cirSelectModel.selectedRows()[0].row())
         self.sqliteObj.commitSqlite()
         self.circulationRecordTable.model().layoutChanged.emit()
-
     def printPushButtonClicked(self):
         print("printPushButtonClicked")
         if self.circulationRecordTable.model().dataSource is None or len(self.circulationRecordTable.model().dataSource)==0:
             return
-        self.printObj.initFile("./data/打印模版.xlsx")
+        self.excelWriterObj.initFile("./data/打印模版.xlsx")
         waitDialog=QMessageBox()
         waitDialog.setWindowTitle("提示")
         waitDialog.setText("正在打印，请稍后")
         waitDialog.setStandardButtons(QMessageBox.NoButton)
         waitDialog.show()
         try:
-            self.printObj.writeData(self.circulationRecordTable.model().dataSource)
+            self.excelWriterObj.writeData(self.circulationRecordTable.model().dataSource)
         except Exception as e:
             print(e)
             QMessageBox.information(self,"提示","打印出错，错误信息："+str(e))
         finally:
             waitDialog.close()
-
     def insertItemRecordPushButtonClicked(self):
         print("insertItemRecordPushButtonClicked")
-        self.excelObj
-
+        self.excelObj.initItemExcelToInsert()
+        while True:
+            rowData=self.excelObj.getItemSheetData()
+            print(rowData)
+            if rowData==[]:
+                break
+            self.sqliteObj.insertItemData(rowData)
+        self.sqliteObj.commitSqlite()
+        QMessageBox.information(self,"提示","添加完成")
+        self.itemIdTextEditChanged()
     def deleteItemRecordPushButton(self):
         print("deleteItemRecordPushButtonClicked")
         self.itemSelectModel=self.itemRecordTable.selectionModel()
@@ -161,7 +164,6 @@ class MainWindow(QMainWindow):
             self.itemRecordTable.model().removeRow(self.itemSelectModel.selectedRows()[0].row())
         self.itemRecordTable.model().layoutChanged.emit()
         self.sqliteObj.commitSqlite()
-
     def itemIdTextEditChanged(self):
         print("itemIdTextEditChanged")
         itemId=self.centralWidget().findChild(QLineEdit, "itemIdTextEdit").text()

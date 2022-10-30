@@ -1,14 +1,15 @@
 import openpyxl
 from openpyxl_image_loader import SheetImageLoader
 from shutil import copyfile
-
 from PySide6.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog
-
 from PySide6.QtGui import QIcon
 import openpyxl.drawing.image
 import os
-import sendToPrinter
+import time
 from PIL import Image
+import win32com.client
+
+import sendToPrinter
 
 def xPosGetter(pointx):#将数字转换为字母
     pointx-=1
@@ -118,6 +119,25 @@ class ExcelReader:
             rowData[i]=str(rowData[i])
             rowData[i] = rowData[i].replace(u'\xa0', u'')
         return rowData
+    def initItemExcelToInsert(self):#初始化要插入的物料单excel
+        copyfile("./data/流转单添加模版.xlsx", "./tmp/流转单添加模版.xlsx")
+        o = win32com.client.Dispatch('Excel.Application')
+        o.visible = True
+        o.DisplayAlerts = True
+        o.DisplayFullScreen = True
+        oBook = o.Workbooks.Open(os.path.abspath("./tmp/流转单添加模版.xlsx"))
+        oSheet = oBook.Worksheets("Sheet1")
+        #print("初始化物料单excel成功")
+        while 1:
+            try:
+                while o.visible:
+                    time.sleep(1)
+                    #print("等待物料单excel关闭中")
+                break
+            except:
+                continue
+        #print("物料单excel已关闭")
+        self.initFile("./tmp/流转单添加模版.xlsx")#为后续读入做准备
 
 class ExcelWriter:
     def __init__(self):#初始化
@@ -215,8 +235,7 @@ class ExcelWriter:
         currentPath=os.getcwd()
         fileName=currentPath+fileName
         sendToPrinter.sendToPrinter(fileName)
-
-if __name__ == '__main__':
-    excel=ExcelReader()
-    excel.initFile('样例.xlsx')
-    print(excel.getCirSheetAllData())
+# if __name__ == '__main__':
+#     excel=ExcelReader()
+#     excel.initFile('样例.xlsx')
+#     print(excel.getCirSheetAllData())

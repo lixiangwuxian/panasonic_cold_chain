@@ -5,7 +5,7 @@ def sendToPrinter(path):
     o.visible = False
     o.DisplayAlerts = False
     print(path)
-    wb = o.Workbooks.Open(path)
+    wb = o.Workbooks.Open(os.path.abspath(path))
     try:
         ws=wb.Worksheets(1)
         if ws is None:
