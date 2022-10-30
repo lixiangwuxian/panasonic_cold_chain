@@ -1,4 +1,5 @@
 import win32com.client
+import os
 
 def sendToPrinter(path):
     o = win32com.client.Dispatch('Excel.Application')
