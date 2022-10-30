@@ -115,9 +115,9 @@ class MainWindow(QMainWindow):
         confirmDialog.setDefaultButton(QMessageBox.No)
         if(confirmDialog.exec()==QMessageBox.No):
             return
-        for i in self.cirSelectModel.selectedRows():
-            self.sqliteObj.deleteCirData(self.dataSource[self.cirSelectModel.selectedRows()[0].row()])
-            self.circulationRecordTable.model().removeRow(self.cirSelectModel.selectedRows()[0].row())
+        for i in range(len(self.cirSelectModel.selectedRows())-1,-1,-1):
+            self.sqliteObj.deleteCirData(self.dataSource[self.cirSelectModel.selectedRows()[i].row()])
+            self.circulationRecordTable.model().removeRow(self.cirSelectModel.selectedRows()[i].row())
         self.sqliteObj.commitSqlite()
         self.circulationRecordTable.model().layoutChanged.emit()
     def printPushButtonClicked(self):
@@ -149,8 +149,8 @@ class MainWindow(QMainWindow):
             self.sqliteObj.insertItemData(rowData)
         if not isEmpty:
             self.sqliteObj.commitSqlite()
-            QMessageBox.information(self,"提示","添加完成")
             self.itemIdTextEditChanged()
+            QMessageBox.information(self,"提示","添加完成")
     def deleteItemRecordPushButton(self):
         print("deleteItemRecordPushButtonClicked")
         self.itemSelectModel=self.itemRecordTable.selectionModel()
@@ -167,9 +167,9 @@ class MainWindow(QMainWindow):
         confirmDialog.setDefaultButton(QMessageBox.No)
         if(confirmDialog.exec()==QMessageBox.No):
             return
-        for i in self.itemSelectModel.selectedRows():
-            self.sqliteObj.deleteItemRecord(self.itemRecordTable.model().dataSource[self.itemSelectModel.selectedRows()[0].row()][4])
-            self.itemRecordTable.model().removeRow(self.itemSelectModel.selectedRows()[0].row())
+        for i in range(len(self.itemSelectModel.selectedRows())-1,-1,-1):
+            self.sqliteObj.deleteItemRecord(self.itemRecordTable.model().dataSource[self.itemSelectModel.selectedRows()[i].row()][4])
+            self.itemRecordTable.model().removeRow(self.itemSelectModel.selectedRows()[i].row())
         self.itemRecordTable.model().layoutChanged.emit()
         self.sqliteObj.commitSqlite()
     def itemIdTextEditChanged(self):
