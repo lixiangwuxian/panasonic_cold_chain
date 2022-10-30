@@ -4,7 +4,7 @@ import datetime
 
 def getStrForNum(num):
     returnStr=''
-    for i in range(4):
+    for i in range(5):
         returnStr=chr(ord('0')+num%10)+returnStr
         num=num//10
     return returnStr
@@ -45,6 +45,7 @@ class sqliteController:
             return None
     def deleteCirData(self,id):#删除单行流转单数据
         self.conn.execute('DELETE FROM book WHERE 编号=?',(id[0],))
+        #print("sqliteController:"+id[0].__str__())
     def dropCirTable(self):#删除流转单数据
         try:
             self.conn.execute('DROP TABLE book')
@@ -79,7 +80,7 @@ class sqliteController:
         return data
     def deleteItemRecord(self,id):#删除单行物料单数据
         self.conn.execute('DELETE FROM detail WHERE id=?',(id,))
-        print("sqliteController:"+id.__str__())
+        #print("sqliteController:"+id.__str__())
     def resetCirCounter(self):#重置流转单计数编号
         self.CirConunter=0
         return
