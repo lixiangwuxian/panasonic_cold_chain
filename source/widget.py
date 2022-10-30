@@ -107,7 +107,10 @@ class MainWindow(QMainWindow):
             return
         confirmDialog=QMessageBox()
         confirmDialog.setWindowTitle("提示")
-        confirmDialog.setText("确认删除？")
+        if len(self.cirSelectModel.selectedRows())>=50:
+            confirmDialog.setText("确定要删除"+str(len(self.cirSelectModel.selectedRows()))+"条记录吗？删除后无法撤销\n删除大量数据可能会导致程序卡住一会，请耐心等待")
+        else:
+            confirmDialog.setText("确定要删除"+str(len(self.cirSelectModel.selectedRows()))+"条记录吗？删除后无法撤销")
         confirmDialog.setStandardButtons(QMessageBox.Yes|QMessageBox.No)
         confirmDialog.setDefaultButton(QMessageBox.No)
         if(confirmDialog.exec()==QMessageBox.No):
@@ -119,33 +122,35 @@ class MainWindow(QMainWindow):
         self.circulationRecordTable.model().layoutChanged.emit()
     def printPushButtonClicked(self):
         print("printPushButtonClicked")
-        if self.circulationRecordTable.model().dataSource is None or len(self.circulationRecordTable.model().dataSource)==0:
-            return
-        self.excelWriterObj.initFile("./data/打印模版.xlsx")
-        waitDialog=QMessageBox()
-        waitDialog.setWindowTitle("提示")
-        waitDialog.setText("正在打印，请稍后")
-        waitDialog.setStandardButtons(QMessageBox.NoButton)
-        waitDialog.show()
         try:
+            if self.circulationRecordTable.model().dataSource is None or len(self.circulationRecordTable.model().dataSource)==0:
+                return
+            self.excelWriterObj.initFile("./data/打印模版.xlsx")
+            waitDialog=QMessageBox()
+            waitDialog.setWindowTitle("提示")
+            waitDialog.setText("正在打印，请稍后")
+            waitDialog.show()
             self.excelWriterObj.writeData(self.circulationRecordTable.model().dataSource)
         except Exception as e:
             print(e)
-            QMessageBox.information(self,"提示","打印出错，错误信息："+str(e))
+            QMessageBox.information(self,"提示","打印出错，错误信息："+e.__str__())
         finally:
-            waitDialog.close()
+            waitDialog.exec()
     def insertItemRecordPushButtonClicked(self):
         print("insertItemRecordPushButtonClicked")
         self.excelObj.initItemExcelToInsert()
+        isEmpty=True
         while True:
             rowData=self.excelObj.getItemSheetData()
-            print(rowData)
+            #print(rowData)
             if rowData==[]:
                 break
+            isEmpty=False
             self.sqliteObj.insertItemData(rowData)
-        self.sqliteObj.commitSqlite()
-        QMessageBox.information(self,"提示","添加完成")
-        self.itemIdTextEditChanged()
+        if not isEmpty:
+            self.sqliteObj.commitSqlite()
+            QMessageBox.information(self,"提示","添加完成")
+            self.itemIdTextEditChanged()
     def deleteItemRecordPushButton(self):
         print("deleteItemRecordPushButtonClicked")
         self.itemSelectModel=self.itemRecordTable.selectionModel()
@@ -154,7 +159,10 @@ class MainWindow(QMainWindow):
             return
         confirmDialog=QMessageBox()
         confirmDialog.setWindowTitle("提示")
-        confirmDialog.setText("确认删除？")
+        if len(self.itemSelectModel.selectedRows())>=50:
+            confirmDialog.setText("确认要删除"+str(len(self.itemSelectModel.selectedRows()))+"条记录吗？删除后无法撤销\n删除大量数据可能会导致程序卡住一会，请耐心等待")
+        else:
+            confirmDialog.setText("确认要删除"+str(len(self.itemSelectModel.selectedRows()))+"条记录吗？删除后无法撤销")
         confirmDialog.setStandardButtons(QMessageBox.Yes|QMessageBox.No)
         confirmDialog.setDefaultButton(QMessageBox.No)
         if(confirmDialog.exec()==QMessageBox.No):
