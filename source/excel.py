@@ -226,11 +226,11 @@ class ExcelWriter:
             self.saveFile(path=self.target)
             self.printFileToPaper()
             self.initFile(self.sourceFile)
-        print("Print done")
+        #print("Print done")
     def saveFile(self,path):#保存文件
         self.workbook.save(path)
     def printFileToPaper(self):#打印文件
-        print('printing to paper')
+        #print('printing to paper')
         fileName=self.target
         fileName=fileName.replace('./tmp/','/tmp/')
         fileName=fileName.replace('/','\\')

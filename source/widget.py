@@ -34,7 +34,7 @@ class MainWindow(QMainWindow):
         self.excelWriterObj=ExcelWriter()
         self.addEventListener()
     def addTableForm(self):#添加表格模版
-        print("Adding table form")
+        #print("Adding table form")
         self.circulationRecordTable=self.centralWidget().findChild(QTableView, "circulationListTableView")
         self.circulationRecordTable.setModel(cirTableModel())
         self.circulationRecordTable.setSelectionBehavior(QAbstractItemView.SelectRows);
@@ -44,13 +44,7 @@ class MainWindow(QMainWindow):
         self.headerWidthList=[100,200,80,150,50,200,50,50,50,50,80,80,80,100,50,80]
         for i in range(len(self.headerWidthList)):
             self.circulationRecordTable.horizontalHeader().resizeSection(i, self.headerWidthList[i])
-        self.dataSource=self.sqliteObj.getLastTimeCirData()
-        #print(self.dataSource)
-        if self.dataSource!=None:
-            for i in range(len(self.dataSource)):
-                self.dataSource[i]=list(self.dataSource[i])
-                #self.dataSource[i].append(self.qrcodeObj.getQrCodeFromData(self.dataSource[i]))
-        self.circulationRecordTable.model().load_data(self.dataSource)
+        self.reloadCirData()
         self.itemRecordTable=self.centralWidget().findChild(QTableView, "itemRecordTableView")
         self.itemRecordTable.setModel(itemTableModel())
         self.itemRecordTable.verticalHeader().hide()
@@ -74,11 +68,18 @@ class MainWindow(QMainWindow):
         #self.centralWidget().findChild(QPushButton, "findItemPushButton").clicked.connect(self.finditemPushButtonClicked)
         self.centralWidget().findChild(QPushButton, "deleteItemRecordPushButton").clicked.connect(self.deleteItemRecordPushButton)
         self.centralWidget().findChild(QLineEdit, "itemIdTextEdit").textChanged.connect(self.itemIdTextEditChanged)
-
+    def reloadCirData(self):
+        self.dataSource=self.sqliteObj.getLastTimeCirData()
+        #print(self.dataSource)
+        if self.dataSource!=None:
+            for i in range(len(self.dataSource)):
+                self.dataSource[i]=list(self.dataSource[i])
+                #self.dataSource[i].append(self.qrcodeObj.getQrCodeFromData(self.dataSource[i]))
+        self.circulationRecordTable.model().load_data(self.dataSource)
 #以下为监听事件
 
     def importPushButtonClicked(self):
-        print("importPushButtonClicked")
+        #print("importPushButtonClicked")
         filePath=self.openFileNameDialog()
         if filePath=="":
             return
@@ -91,7 +92,7 @@ class MainWindow(QMainWindow):
         #self.dataSource[0][14].show()
         for i in files("./tmp","*"):
             os.remove(i)
-        print("All tmp files deleted")
+        #print("All tmp files deleted")
         for i in range(len(self.dataSource)):
             self.dataSource[i]=self.sqliteObj.handleCirTabDataLine(self.dataSource[i])
             self.dataSource[i].append(self.qrcodeObj.getQrCodeFromData(self.dataSource[i]))
@@ -100,14 +101,14 @@ class MainWindow(QMainWindow):
         self.sqliteObj.dropCirTable()
         self.sqliteObj.saveCurrentCirData(self.dataSource)
     def deletePushButtonClicked(self):
-        print("deletePushButtonClicked")
+        #print("deletePushButtonClicked")
         self.cirSelectModel=self.circulationRecordTable.selectionModel()
         if(not self.cirSelectModel.hasSelection()):
             #print("No selection")
             return
         confirmDialog=QMessageBox()
         confirmDialog.setWindowTitle("提示")
-        if len(self.cirSelectModel.selectedRows())>=50:
+        if len(self.cirSelectModel.selectedRows())>=100:
             confirmDialog.setText("确定要删除"+str(len(self.cirSelectModel.selectedRows()))+"条记录吗？删除后无法撤销\n删除大量数据可能会导致程序卡住一会，请耐心等待")
         else:
             confirmDialog.setText("确定要删除"+str(len(self.cirSelectModel.selectedRows()))+"条记录吗？删除后无法撤销")
@@ -117,11 +118,13 @@ class MainWindow(QMainWindow):
             return
         for i in range(len(self.cirSelectModel.selectedRows())-1,-1,-1):
             self.sqliteObj.deleteCirData(self.dataSource[self.cirSelectModel.selectedRows()[i].row()])
-            self.circulationRecordTable.model().removeRow(self.cirSelectModel.selectedRows()[i].row())
+        self.cirSelectModel.clearSelection()
         self.sqliteObj.commitSqlite()
-        self.circulationRecordTable.model().layoutChanged.emit()
+        #self.circulationRecordTable.model().layoutChanged.emit()
+        #self.itemIdTextEditChanged()
+        self.reloadCirData()
     def printPushButtonClicked(self):
-        print("printPushButtonClicked")
+        #print("printPushButtonClicked")
         try:
             if self.circulationRecordTable.model().dataSource is None or len(self.circulationRecordTable.model().dataSource)==0:
                 return
@@ -135,9 +138,13 @@ class MainWindow(QMainWindow):
             print(e)
             QMessageBox.information(self,"提示","打印出错，错误信息："+e.__str__())
         finally:
-            waitDialog.exec()
+            try:
+                waitDialog.close()
+                waitDialog.exec()
+            except:
+                return
     def insertItemRecordPushButtonClicked(self):
-        print("insertItemRecordPushButtonClicked")
+        #print("insertItemRecordPushButtonClicked")
         self.excelObj.initItemExcelToInsert()
         isEmpty=True
         while True:
@@ -152,14 +159,14 @@ class MainWindow(QMainWindow):
             self.itemIdTextEditChanged()
             QMessageBox.information(self,"提示","添加完成")
     def deleteItemRecordPushButton(self):
-        print("deleteItemRecordPushButtonClicked")
+        #print("deleteItemRecordPushButtonClicked")
         self.itemSelectModel=self.itemRecordTable.selectionModel()
         if(not self.itemSelectModel.hasSelection()):
             #print("No selection")
             return
         confirmDialog=QMessageBox()
         confirmDialog.setWindowTitle("提示")
-        if len(self.itemSelectModel.selectedRows())>=50:
+        if len(self.itemSelectModel.selectedRows())>=100:
             confirmDialog.setText("确认要删除"+str(len(self.itemSelectModel.selectedRows()))+"条记录吗？删除后无法撤销\n删除大量数据可能会导致程序卡住一会，请耐心等待")
         else:
             confirmDialog.setText("确认要删除"+str(len(self.itemSelectModel.selectedRows()))+"条记录吗？删除后无法撤销")
@@ -169,11 +176,12 @@ class MainWindow(QMainWindow):
             return
         for i in range(len(self.itemSelectModel.selectedRows())-1,-1,-1):
             self.sqliteObj.deleteItemRecord(self.itemRecordTable.model().dataSource[self.itemSelectModel.selectedRows()[i].row()][4])
-            self.itemRecordTable.model().removeRow(self.itemSelectModel.selectedRows()[i].row())
-        self.itemRecordTable.model().layoutChanged.emit()
+        self.itemSelectModel.clearSelection()
+        #self.itemRecordTable.model().layoutChanged.emit()
         self.sqliteObj.commitSqlite()
+        self.itemIdTextEditChanged()
     def itemIdTextEditChanged(self):
-        print("itemIdTextEditChanged")
+        #print("itemIdTextEditChanged")
         itemId=self.centralWidget().findChild(QLineEdit, "itemIdTextEdit").text()
         #print(itemId)
         self.itemRecordTable.model().load_data(self.sqliteObj.searchInformByPartID(itemId))

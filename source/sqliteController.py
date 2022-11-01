@@ -11,6 +11,8 @@ def getStrForNum(num):
 class sqliteController:
     def __init__(self):
         self.conn=sqlite3.connect('./data/simple.db')
+        self.conn.execute('CREATE TABLE IF NOT EXISTS detail (id INTEGER PRIMARY KEY AUTOINCREMENT, partid TEXT,material TEXT,norm TEXT,num TEXT)')
+        self.conn.execute('CREATE TABLE IF NOT EXISTS book (编号 TEXT PRIMARY KEY, 生产批号 TEXT,生产台数 TEXT,部品番号 TEXT,定额 TEXT,规格 TEXT,送货量 TEXT,材料 TEXT,保管员 TEXT,生产线 TEXT,接收班组 TEXT,供应商 TEXT,到货日期 TEXT,工序 TEXT,工程名 TEXT,安全标识 TEXT,流转单号 TEXT,二维码 TEXT)')
         #self.conn=sqlite3.connect('./data/detail.db')
         self.CirConunter=0
         return
@@ -34,7 +36,7 @@ class sqliteController:
         self.conn.commit()
         return
     def getLastTimeCirData(self):#获取上次流转单数据
-        print('getLastTimeCirData')
+        #print('getLastTimeCirData')
         try:
             cursor=self.conn.execute('SELECT * FROM book')
             CirData=cursor.fetchall()
