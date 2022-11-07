@@ -36,13 +36,13 @@ class ExcelReader:
     def getCirSheetData(self,data):#获取一行流转单数据
         xPos=self.pointerX
         yPos=self.pointerY
-        if self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value==None:
+        if self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value==None:#每十个数据会有一个空行
             yPos+=1
             if self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value==None:
                 return False
             else:
                 self.pointerY=yPos
-        if self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value!="流":
+        if self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value!="流转单":
             return False#不是流转单表
         rowData=[]#流转单；生产批号；生产台数；部品番号；定额；保管员；安全标识；送货量；生产线；工序；接收班组；供应商；工程名；到货日期；
         yPos+=3
