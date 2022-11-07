@@ -195,7 +195,6 @@ class ExcelWriter:
         xPos-=6
         yPos-=1
         self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value=rowData[16]#流转单号16
-        #self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].alignment=openpyxl.styles.Alignment(horizontal='center',vertical='center')
         xPos+=7
         yPos-=4
         self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].alignment=openpyxl.styles.Alignment(horizontal='center',vertical='center')

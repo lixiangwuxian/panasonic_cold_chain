@@ -125,24 +125,20 @@ class MainWindow(QMainWindow):
         self.reloadCirData()
     def printPushButtonClicked(self):
         #print("printPushButtonClicked")
+        waitDialog=QMessageBox()
+        if self.circulationRecordTable.model().dataSource is None or len(self.circulationRecordTable.model().dataSource)==0:
+            return
+        self.excelWriterObj.initFile("./data/打印模版.xlsx")
+        waitDialog.setWindowTitle("提示")
+        waitDialog.setText("正在打印，请稍后")
+        waitDialog.setStandardButtons(QMessageBox.NoButton)
+        waitDialog.show()
         try:
-            if self.circulationRecordTable.model().dataSource is None or len(self.circulationRecordTable.model().dataSource)==0:
-                return
-            self.excelWriterObj.initFile("./data/打印模版.xlsx")
-            waitDialog=QMessageBox()
-            waitDialog.setWindowTitle("提示")
-            waitDialog.setText("正在打印，请稍后")
-            waitDialog.show()
             self.excelWriterObj.writeData(self.circulationRecordTable.model().dataSource)
         except Exception as e:
             print(e)
             QMessageBox.information(self,"提示","打印出错，错误信息："+e.__str__())
-        finally:
-            try:
-                waitDialog.close()
-                waitDialog.exec()
-            except:
-                return
+        waitDialog.close()
     def insertItemRecordPushButtonClicked(self):
         #print("insertItemRecordPushButtonClicked")
         self.excelObj.initItemExcelToInsert()
