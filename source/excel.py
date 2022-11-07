@@ -210,7 +210,7 @@ class ExcelWriter:
                 self.pointerX=1
                 self.pointerY+=7
             else:
-                return False
+                return False#凑够一页
                 # self.saveFile(path=self.target)
                 # self.printFileToPaper()#done one page
                 # self.initFile(self.sourceFile)
