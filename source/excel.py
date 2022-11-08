@@ -8,7 +8,6 @@ import os
 import time
 from PIL import Image
 import win32com.client
-
 import sendToPrinter
 
 def xPosGetter(pointx):#将数字转换为字母
@@ -33,17 +32,21 @@ class ExcelReader:
         self.pointerY=1
         self.workbook=openpyxl.load_workbook(path)
         self.sheet=self.workbook.active
+        self.totalRow=self.sheet.max_row
     def getCirSheetData(self,data):#获取一行流转单数据
         xPos=self.pointerX
         yPos=self.pointerY
-        if self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value==None:#每十个数据会有一个空行
-            yPos+=1
-            if self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value==None:
+        while self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value!="流":
+            if xPos==1:
+                xPos=9
+                continue
+            if xPos==9:
+                yPos+=1
+                xPos=1
+            if yPos>=self.totalRow:
                 return False
-            else:
-                self.pointerY=yPos
-        if self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value!="流转单":
-            return False#不是流转单表
+        self.pointerX=xPos
+        self.pointerY=yPos
         rowData=[]#流转单；生产批号；生产台数；部品番号；定额；保管员；安全标识；送货量；生产线；工序；接收班组；供应商；工程名；到货日期；
         yPos+=3
         rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#流转单0
@@ -80,14 +83,18 @@ class ExcelReader:
         rowData.append(self.sheet[xPosGetter(xPos)+yPosGetter(yPos)].value)#到货日期13
         xPos+=1
         yPos-=4
-        rowData.append(self.image_loader.get(xPosGetter(xPos)+yPosGetter(yPos)))#二维码14
+        try:
+            rowData.append(self.image_loader.get(xPosGetter(xPos)+yPosGetter(yPos)))#二维码14
+        except:
+            rowData.append(None)
         for i in range(0,13):
             if rowData[i]==None:
                 rowData[i]=''
             rowData[i]=str(rowData[i])
             rowData[i] = rowData[i].replace(u'\xa0', u'')
         #print(rowData)
-        data.append(rowData)
+        if rowData[3]!='':
+            data.append(rowData)
         if self.pointerX==1:
             self.pointerX=9
         elif self.pointerX==9:
